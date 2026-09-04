@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sister Beatrice — Level 1 Holy Inquisitor Nun</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #0d0a06;
+            --bg-sheet: #15110a;
+            --panel-bg: #201a10;
+            --panel-sub: #19140c;
+            --card-border: #3d301b;
+            --accent-gold: #f59e0b;
+            --accent-radiant: #facc15;
+            --accent-fire: #f97316;
+            --accent-green: #22c55e;
+            --accent-blue: #38bdf8;
+            --accent-red: #ef4444;
+            --text-light: #fefce8;
+            --text-dim: #cbd5e1;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-page); color: var(--text-light); line-height: 1.5; padding: 16px 12px; display: flex; justify-content: center; font-size: 0.88rem; }
+        .sheet-container { width: 100%; max-width: 1180px; background-color: var(--bg-sheet); border: 1px solid var(--card-border); border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.85); overflow: hidden; }
+        .header-banner { background: linear-gradient(180deg, #2a200f 0%, #15110a 100%); border-bottom: 1px solid var(--card-border); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .header-title h1 { font-family: 'Cinzel', serif; color: var(--accent-radiant); font-size: 1.65rem; font-weight: 700; display: flex; align-items: center; gap: 8px; text-shadow: 0 0 14px rgba(250, 204, 21, 0.35); }
+        .pill-badge { padding: 4px 11px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+        .pill-holy { background: #78350f; color: #fef3c7; border: 1px solid #d97706; }
+        .top-dice-console { background: #0c0905; border-bottom: 1px solid var(--card-border); padding: 10px 18px; display: flex; flex-direction: column; gap: 8px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.5); }
+        .dice-controls-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .dice-btn { background: var(--panel-bg); border: 1px solid var(--card-border); color: var(--text-light); padding: 4px 10px; border-radius: 5px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+        .dice-btn:hover { border-color: var(--accent-radiant); color: var(--accent-radiant); background: rgba(250, 204, 21, 0.1); }
+        .roll-result-display { background: linear-gradient(135deg, #261d0f 0%, #120e06 100%); border: 1.5px solid var(--card-border); border-radius: 6px; padding: 8px 14px; font-size: 0.92rem; min-height: 40px; display: flex; align-items: center; }
+        .roll-result-display.highlight-roll { border-color: var(--accent-radiant); box-shadow: 0 0 14px rgba(250, 204, 21, 0.35); }
+        .main-layout { display: grid; grid-template-columns: 340px 1fr; gap: 14px; padding: 14px 18px; }
+        @media (max-width: 960px) { .main-layout { grid-template-columns: 1fr; } }
+        .panel { background-color: var(--panel-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .panel-title { font-size: 0.84rem; font-weight: 700; color: var(--accent-radiant); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 5px; text-transform: uppercase; }
+        .vitals-4box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+        .vital-mini-box { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 6px 3px; text-align: center; }
+        .hp-ctrl-container { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 8px 10px; display: flex; flex-direction: column; gap: 7px; }
+        .hp-health-bar-bg { width: 100%; height: 9px; background: #0a0704; border-radius: 4px; overflow: hidden; border: 1px solid var(--card-border); }
+        .hp-health-bar-fill { height: 100%; width: 100%; background: var(--accent-green); transition: width 0.3s; }
+        .btn-act { padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: none; }
+        .btn-act-dmg { background: #991b1b; color: #fee2e2; }
+        .btn-act-heal { background: #065f46; color: #d1fae5; }
+        .btn-act-pre { background: #2a2213; color: var(--text-light); border: 1px solid var(--card-border); }
+        .ability-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+        .ability-box { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 5px; text-align: center; padding: 5px 2px; cursor: pointer; }
+        .ability-box.active-key { border: 1.5px solid var(--accent-radiant); background: rgba(250, 204, 21, 0.1); }
+        .stat-row-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+        .stat-row-item { font-size: 0.76rem; padding: 3px 7px; background: var(--panel-sub); border-radius: 4px; display: flex; justify-content: space-between; cursor: pointer; }
+        .stat-row-item.prof-item { color: var(--accent-radiant); font-weight: 600; border-left: 3px solid var(--accent-radiant); }
+        .action-grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+        @media (max-width: 600px) { .action-grid-2col { grid-template-columns: 1fr; } }
+        .action-card { background-color: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 7px 9px; display: flex; flex-direction: column; gap: 4px; }
+        .btn-roll-action { background: #d97706; color: #fff; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
+        .btn-roll-radiant { background: #ca8a04; color: #fff; }
+        .btn-roll-fire { background: #c2410c; color: #fff; }
+        .newbie-box { background: rgba(250, 204, 21, 0.08); border-left: 3px solid var(--accent-radiant); border-radius: 4px; padding: 8px 10px; font-size: 0.75rem; color: #fef08a; line-height: 1.45; }
+    </style>
+</head>
+<body>
+
+<div class="sheet-container">
+    <header class="header-banner">
+        <div>
+            <h1>☀️ SISTER BEATRICE</h1>
+            <div style="font-size:0.84rem; font-weight:700; color:#fde047;">« The Searing Scourge » • Level 1 Light Cleric (Holy DPS)</div>
+            <div style="font-size:0.75rem; color:var(--text-dim);">Annihilates abominations with holy sunlight while shielding her party</div>
+        </div>
+        <div style="display:flex; gap:6px; align-items:center;">
+            <button class="btn-act btn-act-pre" onclick="exportSheetState()" style="color:var(--accent-radiant); border-color:var(--accent-radiant);">📋 Export Data</button>
+            <span class="pill-badge pill-holy">LAWFUL NEUTRAL</span>
+            <span class="pill-badge pill-holy">HOLY DPS</span>
+        </div>
+    </header>
+
+    <section class="top-dice-console">
+        <div class="dice-controls-bar">
+            <div style="display:flex; gap:5px; align-items:center;">
+                <span style="font-size:0.75rem; font-weight:700; color:var(--text-dim);">🎲 Roll:</span>
+                <button class="dice-btn" onclick="rollCustomDie(20)">d20</button>
+                <button class="dice-btn" onclick="rollCustomDie(10)">d10</button>
+                <button class="dice-btn" onclick="rollCustomDie(8)">d8</button>
+                <button class="dice-btn" onclick="rollCustomDie(6)">d6</button>
+                <button class="dice-btn" onclick="rollCustomDie(4)">d4</button>
+            </div>
+            <div style="display:flex; gap:5px; align-items:center;">
+                <span style="font-size:0.75rem; color:var(--text-dim);">Mod:</span>
+                <input type="number" id="dice-mod" value="0" style="width:40px; background:#000; color:#fff; border:1px solid #555; text-align:center; border-radius:3px;">
+                <button class="btn-act btn-act-pre" id="btn-adv" onclick="toggleAdvantage('adv')">Adv</button>
+                <button class="btn-act btn-act-pre" id="btn-dis" onclick="toggleAdvantage('dis')">Dis</button>
+            </div>
+        </div>
+        <div class="roll-result-display" id="roll-res">
+            ☀️ Divine censor glowing. Prepare your holy wrath or cast your spells!
+        </div>
+    </section>
+
+    <div class="main-layout">
+        <!-- LEFT COLUMN -->
+        <div>
+            <!-- VITALS 4-BOX -->
+            <div class="vitals-4box">
+                <div class="vital-mini-box"><span style="font-size:0.65rem; color:var(--text-dim);">HIT POINTS</span><div id="hp-disp" style="font-size:1.1rem; font-weight:700; color:var(--accent-green);">10/10</div></div>
+                <div class="vital-mini-box"><span style="font-size:0.65rem; color:var(--text-dim);">ARMOR CLASS</span><div style="font-size:1.1rem; font-weight:700; color:var(--accent-radiant);">16</div></div>
+                <div class="vital-mini-box" onclick="rollD20('Initiative Check (+2)', 2)" style="cursor:pointer;"><span style="font-size:0.65rem; color:var(--text-dim);">INIT 🎲</span><div style="font-size:1.1rem; font-weight:700; color:var(--accent-blue);">+2</div></div>
+                <div class="vital-mini-box"><span style="font-size:0.65rem; color:var(--text-dim);">SPELL DC / HIT</span><div style="font-size:0.85rem; font-weight:700; color:var(--accent-radiant);">DC 13 | +5</div></div>
+            </div>
+
+            <!-- HP CONTROLLER -->
+            <div class="hp-ctrl-container">
+                <div class="hp-health-bar-bg"><div class="hp-health-bar-fill" id="hp-bar" style="width:100%;"></div></div>
+                <div style="display:flex; gap:6px;">
+                    <input type="number" id="hp-input" placeholder="Amount..." style="flex:1; background:#000; color:#fff; border:1px solid #555; padding:3px; border-radius:3px; text-align:center;">
+                    <button class="btn-act btn-act-dmg" onclick="applyDamage()">💥 Take Dmg</button>
+                    <button class="btn-act btn-act-heal" onclick="applyHeal()">💚 Heal</button>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                    <button class="btn-act btn-act-dmg" onclick="stepHP(-1)">-1 HP</button>
+                    <button class="btn-act btn-act-heal" onclick="stepHP(1)">+1 HP</button>
+                    <button class="btn-act btn-act-pre" onclick="takeShortRest()">☕ Short Rest</button>
+                    <button class="btn-act btn-act-pre" onclick="resetHP()">⛺ Long Rest</button>
+                </div>
+            </div>
+
+            <!-- WARDING FLARE POWER (3/DAY) -->
+            <div class="panel" style="padding:6px 10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:700; color:var(--accent-radiant);">✨ Warding Flare (Reaction)</div>
+                        <div style="font-size:0.66rem; color:var(--text-dim);">Blind attacker to impose Disadvantage (3/Day)</div>
+                    </div>
+                    <button class="btn-act btn-act-pre" id="flare-btn" onclick="useWardingFlare()" style="color:var(--accent-radiant);">✨ Use Flare (<span id="flare-count">3</span>/3)</button>
+                </div>
+            </div>
+
+            <!-- ABILITIES -->
+            <div class="ability-strip">
+                <div class="ability-box" onclick="rollD20('STR Check', 1)"><div style="font-size:0.65rem;">STR</div><div style="font-weight:700;">12</div><div style="font-size:0.7rem;">+1</div></div>
+                <div class="ability-box" onclick="rollD20('DEX Check', 2)"><div style="font-size:0.65rem;">DEX</div><div style="font-weight:700;">14</div><div style="font-size:0.7rem;">+2</div></div>
+                <div class="ability-box" onclick="rollD20('CON Check', 2)"><div style="font-size:0.65rem;">CON</div><div style="font-weight:700;">14</div><div style="font-size:0.7rem;">+2</div></div>
+                <div class="ability-box" onclick="rollD20('INT Check', -1)"><div style="font-size:0.65rem;">INT</div><div style="font-weight:700;">8</div><div style="font-size:0.7rem;">-1</div></div>
+                <div class="ability-box active-key" onclick="rollD20('WIS Check (Key)', 3)"><div style="font-size:0.65rem; color:var(--accent-radiant);">WIS ★</div><div style="font-weight:700; color:var(--accent-radiant);">16</div><div style="font-size:0.7rem; color:var(--accent-radiant);">+3</div></div>
+                <div class="ability-box" onclick="rollD20('CHA Check', 0)"><div style="font-size:0.65rem;">CHA</div><div style="font-weight:700;">10</div><div style="font-size:0.7rem;">+0</div></div>
+            </div>
+
+            <!-- SAVES & SKILLS -->
+            <div class="panel">
+                <div class="panel-title"><span>🛡️ Saves & Proficiencies</span></div>
+                <ul class="stat-row-list">
+                    <li class="stat-row-item prof-item" onclick="rollD20('WIS Save ★', 5)"><span>Wisdom Save ★</span><span>+5 🎲</span></li>
+                    <li class="stat-row-item prof-item" onclick="rollD20('CHA Save ★', 2)"><span>Charisma Save ★</span><span>+2 🎲</span></li>
+                    <li class="stat-row-item prof-item" onclick="rollD20('Religion (INT) ★', 1)"><span>Religion (INT) ★</span><span>+1 🎲</span></li>
+                    <li class="stat-row-item prof-item" onclick="rollD20('Insight (WIS) ★', 5)"><span>Insight (WIS) ★</span><span>+5 🎲</span></li>
+                    <li class="stat-row-item prof-item" onclick="rollD20('Medicine (WIS) ★', 5)"><span>Medicine (WIS) ★</span><span>+5 🎲</span></li>
+                    <li class="stat-row-item" onclick="rollD20('Perception (WIS)', 3)"><span>Perception (WIS)</span><span>+3 🎲</span></li>
+                </ul>
+            </div>
+
+            <!-- BEGINNER'S GUIDE -->
+            <div class="panel">
+                <div class="panel-title"><span>📖 Nun's Combat Doctrine</span></div>
+                <div class="newbie-box">
+                    <strong>1. The 4d6 Guiding Bolt Nuke:</strong> You are a DPS monster! Fire <em>Guiding Bolt</em> to deal huge 4d6 Radiant damage. The next ally attacking the target gains <strong>Advantage</strong>!<br><br>
+                    <strong>2. Bonus Action Healing:</strong> Cast <em>Healing Word</em> using a <strong>Bonus Action</strong> so you can still swing your mace or cast a cantrip on the same turn!<br><br>
+                    <strong>3. Warding Flare Defense:</strong> When an enemy attacks you, use your <strong>Reaction</strong> to blind them with sunlight!
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+            <!-- AT-WILL ACTIONS & CANTRIPS -->
+            <div class="panel">
+                <div class="panel-title"><span>☀️ Holy Cantrips & Mace Strikes</span><span style="font-size:0.7rem; color:var(--accent-radiant);">Unlimited</span></div>
+                <div class="action-grid-2col">
+                    <!-- Sacred Flame -->
+                    <div class="action-card">
+                        <div style="font-weight:700; color:#fde047;">🔥 Sacred Flame <span style="font-size:0.65rem; color:#f59e0b;">(Cantrip • 1 Act)</span></div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">60ft. Target makes <strong>DC 13 DEX Save</strong> (ignores cover!) or takes <strong>1d8 Radiant Damage</strong>.</div>
+                        <div style="display:flex; gap:4px; margin-top:4px;">
+                            <button class="btn-roll-action btn-roll-radiant" onclick="rollFormulaDamage('Sacred Flame', 8, 0, 'Radiant')">💥 1d8 Radiant</button>
+                        </div>
+                    </div>
+                    <!-- Word of Radiance -->
+                    <div class="action-card">
+                        <div style="font-weight:700; color:#fde047;">✨ Word of Radiance <span style="font-size:0.65rem; color:#f59e0b;">(Cantrip • 1 Act)</span></div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">5ft Burst. All chosen enemies make <strong>DC 13 CON Save</strong> or take <strong>1d6 Radiant Damage</strong>.</div>
+                        <div style="display:flex; gap:4px; margin-top:4px;">
+                            <button class="btn-roll-action btn-roll-radiant" onclick="rollFormulaDamage('Word of Radiance', 6, 0, 'Radiant')">💥 1d6 Burst</button>
+                        </div>
+                    </div>
+                    <!-- Heavy Mace -->
+                    <div class="action-card">
+                        <div style="font-weight:700; color:#cbd5e1;">🔨 Consecrated Mace <span style="font-size:0.65rem; color:#94a3b8;">(Melee • 1 Act)</span></div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">Melee 5ft. +3 to Hit, <strong>1d6 + 1 Bludgeoning</strong>.</div>
+                        <div style="display:flex; gap:4px; margin-top:4px;">
+                            <button class="btn-roll-action" onclick="rollD20('Mace Attack', 3)">🔨 Attack (+3)</button>
+                            <button class="btn-roll-action btn-roll-dmg" onclick="rollFormulaDamage('Mace Damage', 6, 1, 'Bludgeoning')">💥 1d6+1</button>
+                        </div>
+                    </div>
+                    <!-- Guidance -->
+                    <div class="action-card">
+                        <div style="font-weight:700; color:#38bdf8;">🙏 Guidance <span style="font-size:0.65rem; color:#38bdf8;">(Cantrip • 1 Act • Touch)</span></div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">Touch ally. Grants <strong>+1d4</strong> to their next ability check!</div>
+                        <div style="display:flex; gap:4px; margin-top:4px;">
+                            <button class="btn-roll-action" onclick="rollFormulaDamage('Guidance Blessing', 4, 0, 'Bonus')">🎲 Roll +1d4</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEVEL 1 DIVINE SPELLS -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>⚡ 1st-Level Divine Spells</span>
+                    <span id="slot-disp" style="font-size:0.74rem; color:var(--accent-radiant);">Slots: 🟦 🟦 (2/2)</span>
+                </div>
+                <div class="action-grid-2col">
+                    <!-- Guiding Bolt -->
+                    <div class="action-card">
+                        <div style="font-weight:700; color:#fde047;">⚡ Guiding Bolt <span style="font-size:0.65rem; color:#f59e0b;">(1st Lvl • 1 Act)</span></div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">120ft. +5 Spell Attack. Deals <strong>4d6 Radiant Damage</strong> & next attack against target has <strong>Advantage</strong>!</div>
+                        <div style="display:flex; gap:4px; margin-top:4px;">
+                            <button class="btn-roll-action btn-roll-radiant" onclick="castSlotSpell('Guiding Bolt Attack', 5)">🎯 Cast & Attack (+5)</button>
+                            <button class="btn-roll-action btn-roll-radiant" onclick="rollGuidingBoltDmg()">💥 4d6 Radiant</button>
+                        </div>
+                    </div>
+                    <!-- Inflict Wounds -->
+                    <div class="action-card">
+                        <div style="font-weight:700; color:#ef4444;">💀 Inflict Wounds <span style="font-size:0.65rem; color:#f87171;">(1st Lvl • 1 Act • Touch)</span></div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">Melee Touch. +5 Hit. Chunnels devastating dark energy dealing <strong>3d10 Necrotic Damage</strong>!</div>
+                        <div style="display:flex; gap:4px; margin-top:4px;">
+                            <button class="btn-roll-action btn-roll-dmg" onclick="castSlotSpell('Inflict Wounds Attack', 5)">🎯 Touch (+5)</button>
+                            <button class="btn-roll-action btn-roll-dmg" onclick="rollInflictWoundsDmg()">💥 3d10 Dmg</button>
+                        </div>
+                    </div>
+                    <!-- Burning Hands -->
+                    <div class="action-card">
+                        <div style="font-weight:700; color:#f97316;">🔥 Burning Hands <span style="font-size:0.65rem; color:#f97316;">(1st Lvl Domain • 1 Act)</span></div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">15ft Cone. DC 13 DEX Save. Deals <strong>3d6 Fire Damage</strong> (half on save).</div>
+                        <div style="display:flex; gap:4px; margin-top:4px;">
+                            <button class="btn-roll-action btn-roll-fire" onclick="castBurningHands()">🔥 Cast 3d6 Cone</button>
+                        </div>
+                    </div>
+                    <!-- Healing Word -->
+                    <div class="action-card">
+                        <div style="font-weight:700; color:#22c55e;">💚 Healing Word <span style="font-size:0.65rem; color:#4ade80;">(1st Lvl • BONUS ACT)</span></div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">60ft. Bonus Action! Instantly heals an ally for <strong>1d4 + 3 HP</strong>.</div>
+                        <div style="display:flex; gap:4px; margin-top:4px;">
+                            <button class="btn-roll-action" style="background:#059669;" onclick="castHealingWord()">💚 Heal 1d4+3 (Bonus Act)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INVENTORY & PURSE -->
+            <div class="panel">
+                <div class="panel-title"><span>🎒 Vestments & Holy Relics</span><span style="color:var(--accent-radiant); font-size:0.75rem;">💰 12 GP • 5 SP</span></div>
+                <div style="font-size:0.74rem; color:var(--text-dim); display:flex; flex-direction:column; gap:3px;">
+                    <div>• 🛡️ <strong>Chain Shirt & Steel Shield:</strong> Base AC 16.</div>
+                    <div>• ☀️ <strong>Sun-Emblazoned Holy Symbol:</strong> Focus for casting divine spells.</div>
+                    <div>• 🧪 <strong>Potion of Healing (x1):</strong> Restores 2d4+2 HP when consumed.</div>
+                    <div>• 📖 <strong>Sacred Book of Hours:</strong> Prayer manual and catechism.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let curHP = 10, maxHP = 10, slots = 2, maxSlots = 2, flares = 3, rollMode = 'norm';
+
+    function updateHPUI() {
+        document.getElementById('hp-bar').style.width = `${(curHP / maxHP) * 100}%`;
+        const d = document.getElementById('hp-disp');
+        d.innerText = `${curHP}/${maxHP}`;
+        d.style.color = curHP > 5 ? 'var(--accent-green)' : 'var(--accent-red)';
+    }
+
+    function applyDamage() {
+        const inp = document.getElementById('hp-input');
+        const dmg = parseInt(inp.value) || 1;
+        inp.value = '';
+        curHP = Math.max(0, curHP - dmg);
+        updateHPUI();
+        logRoll(`💥 Took ${dmg} damage! HP: ${curHP}/${maxHP}`);
+    }
+
+    function applyHeal() {
+        const inp = document.getElementById('hp-input');
+        const h = parseInt(inp.value) || 1;
+        inp.value = '';
+        curHP = Math.min(maxHP, curHP + h);
+        updateHPUI();
+        logRoll(`💚 Healed +${h} HP! HP: ${curHP}/${maxHP}`);
+    }
+
+    function stepHP(d) { curHP = Math.max(0, Math.min(maxHP, curHP + d)); updateHPUI(); }
+    function takeShortRest() { curHP = Math.min(maxHP, curHP + 4); updateHPUI(); logRoll('☕ Regained +4 HP on Short Rest.'); }
+    function resetHP() { curHP = maxHP; slots = maxSlots; flares = 3; document.getElementById('flare-count').innerText = '3'; updateSlotDisp(); updateHPUI(); logRoll('⛺ Full Long Rest complete! HP, Spell Slots & Flares restored.'); }
+
+    function updateSlotDisp() {
+        document.getElementById('slot-disp').innerText = `Slots: ${slots === 2 ? '🟦 🟦 (2/2)' : slots === 1 ? '🟦 ⬛ (1/2)' : '⬛ ⬛ (0/2)'}`;
+    }
+
+    function useWardingFlare() {
+        if (flares <= 0) { logRoll('⚠️ 0 Warding Flares left today!'); return; }
+        flares--;
+        document.getElementById('flare-count').innerText = flares;
+        logRoll(`✨ <strong>WARDING FLARE TRIGGERED (Reaction):</strong> You flash blinding sunlight in the attacker's face! The enemy's attack has <span style="color:var(--accent-radiant); font-weight:700;">DISADVANTAGE</span>! (${flares}/3 left)`);
+    }
+
+    function castSlotSpell(name, mod) {
+        if (slots <= 0) { logRoll('⚠️ 0 Spell Slots remaining!'); return; }
+        slots--;
+        updateSlotDisp();
+        rollD20(name + ' (-1 Slot)', mod);
+    }
+
+    function rollGuidingBoltDmg() {
+        let t = 0, rolls = [];
+        for (let i = 0; i < 4; i++) { const r = Math.floor(Math.random()*6)+1; rolls.push(r); t += r; }
+        logRoll(`⚡ <strong>Guiding Bolt Damage:</strong> [${rolls.join('+')}] = <span style="color:var(--accent-radiant); font-weight:700;">${t} Radiant Damage</span>! Next attack vs target has <strong>ADVANTAGE</strong>!`);
+    }
+
+    function rollInflictWoundsDmg() {
+        let t = 0, rolls = [];
+        for (let i = 0; i < 3; i++) { const r = Math.floor(Math.random()*10)+1; rolls.push(r); t += r; }
+        logRoll(`💀 <strong>Inflict Wounds Damage:</strong> [${rolls.join('+')}] = <span style="color:#ef4444; font-weight:700;">${t} Necrotic Damage</span>!`);
+    }
+
+    function castBurningHands() {
+        if (slots <= 0) { logRoll('⚠️ 0 Spell Slots remaining!'); return; }
+        slots--;
+        updateSlotDisp();
+        let t = 0, rolls = [];
+        for (let i = 0; i < 3; i++) { const r = Math.floor(Math.random()*6)+1; rolls.push(r); t += r; }
+        logRoll(`🔥 <strong>Burning Hands Cast (15ft Cone):</strong> [${rolls.join('+')}] = <span style="color:#f97316; font-weight:700;">${t} Fire Damage</span> (DC 13 DEX save for half)!`);
+    }
+
+    function castHealingWord() {
+        if (slots <= 0) { logRoll('⚠️ 0 Spell Slots remaining!'); return; }
+        slots--;
+        updateSlotDisp();
+        const r = Math.floor(Math.random()*4)+1;
+        logRoll(`💚 <strong>Healing Word Cast (Bonus Action):</strong> Heals ally for [d4:${r} + 3] = <span style="color:#22c55e; font-weight:700;">+${r+3} HP</span>!`);
+    }
+
+    function logRoll(msg) {
+        const r = document.getElementById('roll-res');
+        r.innerHTML = msg;
+        r.classList.remove('highlight-roll');
+        void r.offsetWidth;
+        r.classList.add('highlight-roll');
+    }
+
+    function toggleAdvantage(m) {
+        rollMode = rollMode === m ? 'norm' : m;
+        document.getElementById('btn-adv').style.background = rollMode === 'adv' ? 'var(--accent-green)' : '#2a2213';
+        document.getElementById('btn-dis').style.background = rollMode === 'dis' ? 'var(--accent-red)' : '#2a2213';
+    }
+
+    function rollCustomDie(s) {
+        const mod = parseInt(document.getElementById('dice-mod').value) || 0;
+        const roll = Math.floor(Math.random() * s) + 1;
+        logRoll(`🎲 <strong>d${s} Roll:</strong> (${roll}) = <span style="color:var(--accent-radiant); font-weight:700;">${roll+mod}</span>`);
+    }
+
+    function rollD20(label, mod) {
+        const extra = parseInt(document.getElementById('dice-mod').value) || 0;
+        const total = mod + extra;
+        const r1 = Math.floor(Math.random() * 20) + 1;
+        const r2 = Math.floor(Math.random() * 20) + 1;
+        let c = rollMode === 'adv' ? Math.max(r1, r2) : rollMode === 'dis' ? Math.min(r1, r2) : r1;
+        logRoll(`🎯 <strong>${label}:</strong> d20(${c}) ${total>=0?'+'+total:total} = <span style="color:var(--accent-radiant); font-weight:700;">${c+total}</span>`);
+    }
+
+    function rollFormulaDamage(label, sides, bonus, type) {
+        const r = Math.floor(Math.random() * sides) + 1;
+        logRoll(`💥 <strong>${label}:</strong> [d${sides}:${r} + ${bonus}] = <span style="color:var(--accent-radiant); font-weight:700;">${r+bonus}</span> ${type} Damage`);
+    }
+
+    function exportSheetState() {
+        const str = `☀️ SISTER BEATRICE [HP: ${curHP}/${maxHP} | AC: 16 | Slots: L1(${slots}/2) | Flares: ${flares}/3] • 📦 Inventory: (No changes)`;
+        navigator.clipboard.writeText(str).then(() => logRoll(`📋 <strong>Exported:</strong> ${str}`));
+    }
+</script>
+</body>
+</html>
