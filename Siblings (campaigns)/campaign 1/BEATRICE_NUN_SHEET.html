@@ -1,396 +1,1966 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sister Beatrice — Level 1 Holy Inquisitor Nun</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-page: #0d0a06;
-            --bg-sheet: #15110a;
-            --panel-bg: #201a10;
-            --panel-sub: #19140c;
-            --card-border: #3d301b;
-            --accent-gold: #f59e0b;
-            --accent-radiant: #facc15;
-            --accent-fire: #f97316;
-            --accent-green: #22c55e;
-            --accent-blue: #38bdf8;
-            --accent-red: #ef4444;
-            --text-light: #fefce8;
-            --text-dim: #cbd5e1;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-page); color: var(--text-light); line-height: 1.5; padding: 16px 12px; display: flex; justify-content: center; font-size: 0.88rem; }
-        .sheet-container { width: 100%; max-width: 1180px; background-color: var(--bg-sheet); border: 1px solid var(--card-border); border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.85); overflow: hidden; }
-        .header-banner { background: linear-gradient(180deg, #2a200f 0%, #15110a 100%); border-bottom: 1px solid var(--card-border); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .header-title h1 { font-family: 'Cinzel', serif; color: var(--accent-radiant); font-size: 1.65rem; font-weight: 700; display: flex; align-items: center; gap: 8px; text-shadow: 0 0 14px rgba(250, 204, 21, 0.35); }
-        .pill-badge { padding: 4px 11px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
-        .pill-holy { background: #78350f; color: #fef3c7; border: 1px solid #d97706; }
-        .top-dice-console { background: #0c0905; border-bottom: 1px solid var(--card-border); padding: 10px 18px; display: flex; flex-direction: column; gap: 8px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.5); }
-        .dice-controls-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-        .dice-btn { background: var(--panel-bg); border: 1px solid var(--card-border); color: var(--text-light); padding: 4px 10px; border-radius: 5px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-        .dice-btn:hover { border-color: var(--accent-radiant); color: var(--accent-radiant); background: rgba(250, 204, 21, 0.1); }
-        .roll-result-display { background: linear-gradient(135deg, #261d0f 0%, #120e06 100%); border: 1.5px solid var(--card-border); border-radius: 6px; padding: 8px 14px; font-size: 0.92rem; min-height: 40px; display: flex; align-items: center; }
-        .roll-result-display.highlight-roll { border-color: var(--accent-radiant); box-shadow: 0 0 14px rgba(250, 204, 21, 0.35); }
-        .main-layout { display: grid; grid-template-columns: 340px 1fr; gap: 14px; padding: 14px 18px; }
-        @media (max-width: 960px) { .main-layout { grid-template-columns: 1fr; } }
-        .panel { background-color: var(--panel-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
-        .panel-title { font-size: 0.84rem; font-weight: 700; color: var(--accent-radiant); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 5px; text-transform: uppercase; }
-        .vitals-4box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
-        .vital-mini-box { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 6px 3px; text-align: center; }
-        .hp-ctrl-container { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 8px 10px; display: flex; flex-direction: column; gap: 7px; }
-        .hp-health-bar-bg { width: 100%; height: 9px; background: #0a0704; border-radius: 4px; overflow: hidden; border: 1px solid var(--card-border); }
-        .hp-health-bar-fill { height: 100%; width: 100%; background: var(--accent-green); transition: width 0.3s; }
-        .btn-act { padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: none; }
-        .btn-act-dmg { background: #991b1b; color: #fee2e2; }
-        .btn-act-heal { background: #065f46; color: #d1fae5; }
-        .btn-act-pre { background: #2a2213; color: var(--text-light); border: 1px solid var(--card-border); }
-        .ability-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
-        .ability-box { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 5px; text-align: center; padding: 5px 2px; cursor: pointer; }
-        .ability-box.active-key { border: 1.5px solid var(--accent-radiant); background: rgba(250, 204, 21, 0.1); }
-        .stat-row-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
-        .stat-row-item { font-size: 0.76rem; padding: 3px 7px; background: var(--panel-sub); border-radius: 4px; display: flex; justify-content: space-between; cursor: pointer; }
-        .stat-row-item.prof-item { color: var(--accent-radiant); font-weight: 600; border-left: 3px solid var(--accent-radiant); }
-        .action-grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-        @media (max-width: 600px) { .action-grid-2col { grid-template-columns: 1fr; } }
-        .action-card { background-color: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 7px 9px; display: flex; flex-direction: column; gap: 4px; }
-        .btn-roll-action { background: #d97706; color: #fff; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
-        .btn-roll-radiant { background: #ca8a04; color: #fff; }
-        .btn-roll-fire { background: #c2410c; color: #fff; }
-        .newbie-box { background: rgba(250, 204, 21, 0.08); border-left: 3px solid var(--accent-radiant); border-radius: 4px; padding: 8px 10px; font-size: 0.75rem; color: #fef08a; line-height: 1.45; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sister Beatrice - D&D 5e Character Sheet</title>
+<style>
+:root {
+  --bg-primary: #0f1015;
+  --bg-secondary: #181924;
+  --bg-card: #202232;
+  --bg-card-hover: #292b3f;
+  --accent-gold: #e5a93c;
+  --accent-gold-glow: rgba(229, 169, 60, 0.35);
+  --accent-sun: #f39c12;
+  --accent-sun-glow: rgba(243, 156, 18, 0.4);
+  --accent-crimson: #c0392b;
+  --accent-blue: #3498db;
+  --accent-green: #2ecc71;
+  --accent-purple: #9b59b6;
+  --text-main: #f0f2f5;
+  --text-muted: #9ba1b0;
+  --text-dim: #656a7a;
+  --border-subtle: #2d3047;
+  --border-gold: #8a6824;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-display: 'Cinzel', Georgia, serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  line-height: 1.5;
+  padding: 12px;
+  padding-bottom: 60px;
+}
+
+.sheet-container {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* TOP CONSOLE */
+.dice-console {
+  background: linear-gradient(135deg, #1b1c29 0%, #26231a 100%);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.console-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 6px;
+}
+
+.console-title {
+  font-family: var(--font-display);
+  color: var(--accent-gold);
+  font-size: 0.95rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.console-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.adv-dis-toggle {
+  display: flex;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.adv-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.adv-btn.active-adv { background: #27ae60; color: #fff; }
+.adv-btn.active-dis { background: #c0392b; color: #fff; }
+
+.dice-result-box {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 52px;
+}
+
+.dice-roll-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.dice-roll-calc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.dice-roll-total {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: var(--accent-gold);
+  text-shadow: 0 0 10px var(--accent-gold-glow);
+}
+
+.crit-success { color: #2ecc71 !important; text-shadow: 0 0 12px rgba(46, 204, 113, 0.6) !important; }
+.crit-fail { color: #e74c3c !important; text-shadow: 0 0 12px rgba(231, 76, 60, 0.6) !important; }
+
+.quick-dice-bar {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.q-die-btn {
+  flex: 1;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-gold);
+  border-radius: var(--radius-sm);
+  padding: 5px 0;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-width: 44px;
+}
+
+.q-die-btn:hover {
+  background: var(--accent-gold);
+  color: #000;
+}
+
+/* HEADER CARD */
+.char-header {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.char-title-group h1 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.char-subtitle {
+  color: var(--accent-gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.char-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-class { background: rgba(243, 156, 18, 0.2); color: #f39c12; border: 1px solid rgba(243, 156, 18, 0.4); }
+.badge-race { background: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.4); }
+.badge-align { background: rgba(155, 89, 182, 0.2); color: #9b59b6; border: 1px solid rgba(155, 89, 182, 0.4); }
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.btn-export {
+  background: linear-gradient(135deg, #27ae60, #1e8449);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.btn-export:hover { filter: brightness(1.1); }
+
+/* 4-BOX VITALS ROW */
+.vitals-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.vital-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 8px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.vital-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.vital-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: #fff;
+  margin-top: 2px;
+}
+
+.vital-box.clickable {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.vital-box.clickable:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-gold);
+}
+
+.vital-sub {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+/* HP & TEMP HP CONTROLLER */
+.hp-tracker-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+
+.hp-bar-container {
+  background: #111;
+  border-radius: 10px;
+  height: 14px;
+  overflow: hidden;
+  margin: 8px 0 12px;
+  border: 1px solid var(--border-subtle);
+  position: relative;
+}
+
+.hp-bar-fill {
+  background: linear-gradient(90deg, #c0392b, #27ae60);
+  height: 100%;
+  width: 100%;
+  transition: width 0.3s ease;
+}
+
+.hp-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .hp-controls-grid { grid-template-columns: 1fr; }
+  .vitals-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+.hp-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.step-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.step-btn:hover { background: var(--bg-card-hover); border-color: var(--accent-gold); }
+
+.step-input {
+  width: 50px;
+  background: #111;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: bold;
+  padding: 5px 0;
+}
+
+.btn-damage { background: rgba(192, 57, 43, 0.3); border-color: #c0392b; color: #ff7675; }
+.btn-heal { background: rgba(46, 204, 113, 0.3); border-color: #2ecc71; color: #55efc4; }
+
+.hp-quick-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.btn-quick-action {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 5px 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-quick-action:hover { color: #fff; border-color: var(--text-muted); }
+
+/* BUFF TOGGLES & HELP TOKENS */
+.toggles-tokens-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .toggles-tokens-card { grid-template-columns: 1fr; }
+}
+
+.buff-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #333;
+  transition: .3s;
+  border-radius: 24px;
+  border: 1px solid var(--border-subtle);
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: var(--accent-sun);
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+.token-boxes {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.token-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-gold);
+  background: var(--accent-gold);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0 6px var(--accent-gold-glow);
+}
+
+.token-dot.spent {
+  background: transparent;
+  box-shadow: none;
+  border-color: var(--text-dim);
+}
+
+/* STATS & SAVES */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 650px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.stat-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.stat-box:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-gold);
+}
+
+.stat-abbr {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.stat-mod {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: var(--font-display);
+}
+
+.stat-score {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  background: rgba(0,0,0,0.3);
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* 6 SAVING THROWS */
+.saves-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+}
+
+.saves-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.saves-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+@media (max-width: 650px) {
+  .saves-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.save-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 5px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.save-pill:hover { border-color: var(--accent-gold); background: var(--bg-card-hover); }
+.save-pill.prof { border-color: var(--accent-gold); background: rgba(229, 169, 60, 0.1); }
+.save-pill-name { font-size: 0.7rem; color: var(--text-muted); }
+.save-pill.prof .save-pill-name { color: var(--accent-gold); font-weight: bold; }
+.save-pill-val { font-size: 0.95rem; font-weight: bold; color: #fff; }
+
+/* 18 SKILLS ACCORDION/GRID */
+.skills-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+@media (max-width: 700px) {
+  .skills-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .skills-grid { grid-template-columns: 1fr; }
+}
+
+.skill-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.skill-btn:hover { background: var(--bg-card-hover); border-color: var(--accent-gold); }
+.skill-btn.prof { border-color: rgba(229, 169, 60, 0.6); background: rgba(229, 169, 60, 0.08); }
+.skill-left { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: var(--text-main); }
+.skill-stat { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; }
+.skill-prof-star { color: var(--accent-gold); font-size: 0.7rem; }
+.skill-val { font-size: 0.85rem; font-weight: bold; color: var(--accent-gold); }
+
+/* GOLD PURSE */
+.gold-card {
+  background: linear-gradient(135deg, #1f1b14 0%, #26231a 100%);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.gold-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gold-coin-stack {
+  font-size: 1.6rem;
+}
+
+.gold-numbers {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--accent-gold);
+}
+
+.gold-steppers {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.g-btn {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border-gold);
+  color: var(--accent-gold);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.g-btn:hover { background: var(--accent-gold); color: #000; }
+
+/* ACTIONS & SPELLS */
+.section-title {
+  font-family: var(--font-display);
+  color: var(--accent-gold);
+  font-size: 1.1rem;
+  margin: 10px 0 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.action-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.15s;
+}
+
+.action-card:hover { border-color: rgba(229, 169, 60, 0.4); }
+
+.action-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.action-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-name {
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.action-badge {
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 1px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.badge-action { background: rgba(52, 152, 219, 0.2); color: #3498db; border: 1px solid rgba(52, 152, 219, 0.3); }
+.badge-bonus { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.3); }
+.badge-reaction { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); }
+
+.action-desc-short {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.action-right {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-roll-act {
+  background: var(--bg-card);
+  border: 1px solid var(--border-gold);
+  color: var(--accent-gold);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-roll-act:hover { background: var(--accent-gold); color: #000; }
+
+.btn-info-act {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-info-act:hover { color: #fff; border-color: var(--text-main); }
+
+/* SPELL SLOTS TRACKER */
+.spell-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.spell-slot-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px;
+  text-align: center;
+}
+
+.spell-slot-box.locked {
+  opacity: 0.5;
+  filter: grayscale(0.8);
+}
+
+.spell-slot-tier {
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: var(--accent-gold);
+}
+
+.spell-slot-bubbles {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.slot-bubble {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #3498db;
+  background: #3498db;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0 6px rgba(52, 152, 219, 0.4);
+}
+
+.slot-bubble.used {
+  background: transparent;
+  box-shadow: none;
+  border-color: var(--text-dim);
+}
+
+/* INVENTORY */
+.inventory-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+}
+
+.inv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.inv-input-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.inv-input {
+  flex: 1;
+  background: #111;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.btn-add-inv {
+  background: var(--accent-gold);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.inv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inv-item-row {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inv-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.inv-item-left:hover {
+  color: var(--accent-gold);
+}
+
+.inv-steppers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inv-btn {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.inv-btn:hover { color: #fff; border-color: var(--accent-gold); }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 18px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.modal-close:hover { color: #fff; }
+
+.modal-title {
+  font-family: var(--font-display);
+  color: var(--accent-gold);
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+
+.modal-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.modal-desc {
+  font-size: 0.88rem;
+  color: #d1d5db;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.modal-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  background: rgba(0,0,0,0.3);
+  padding: 10px;
+  border-radius: var(--radius-md);
+  margin-bottom: 14px;
+  font-size: 0.8rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-modal-roll {
+  flex: 1;
+  background: var(--accent-gold);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+</style>
 </head>
 <body>
 
 <div class="sheet-container">
-    <header class="header-banner">
-        <div>
-            <h1>☀️ SISTER BEATRICE</h1>
-            <div style="font-size:0.84rem; font-weight:700; color:#fde047;">« The Searing Scourge » • Level 1 Light Cleric (Holy DPS)</div>
-            <div style="font-size:0.75rem; color:var(--text-dim);">Annihilates abominations with holy sunlight while shielding her party</div>
+
+  <!-- TOP DICE CONSOLE -->
+  <div class="dice-console">
+    <div class="console-header">
+      <div class="console-title">☀️ DICE CONSOLE</div>
+      <div class="console-controls">
+        <span>Adv / Dis:</span>
+        <div class="adv-dis-toggle">
+          <button class="adv-btn" id="btnAdv" onclick="toggleAdv('adv')">ADV</button>
+          <button class="adv-btn" id="btnDis" onclick="toggleAdv('dis')">DIS</button>
         </div>
-        <div style="display:flex; gap:6px; align-items:center;">
-            <button class="btn-act btn-act-pre" onclick="exportSheetState()" style="color:var(--accent-radiant); border-color:var(--accent-radiant);">📋 Export Data</button>
-            <span class="pill-badge pill-holy">LAWFUL NEUTRAL</span>
-            <span class="pill-badge pill-holy">HOLY DPS</span>
-        </div>
-    </header>
-
-    <section class="top-dice-console">
-        <div class="dice-controls-bar">
-            <div style="display:flex; gap:5px; align-items:center;">
-                <span style="font-size:0.75rem; font-weight:700; color:var(--text-dim);">🎲 Roll:</span>
-                <button class="dice-btn" onclick="rollCustomDie(20)">d20</button>
-                <button class="dice-btn" onclick="rollCustomDie(10)">d10</button>
-                <button class="dice-btn" onclick="rollCustomDie(8)">d8</button>
-                <button class="dice-btn" onclick="rollCustomDie(6)">d6</button>
-                <button class="dice-btn" onclick="rollCustomDie(4)">d4</button>
-            </div>
-            <div style="display:flex; gap:5px; align-items:center;">
-                <span style="font-size:0.75rem; color:var(--text-dim);">Mod:</span>
-                <input type="number" id="dice-mod" value="0" style="width:40px; background:#000; color:#fff; border:1px solid #555; text-align:center; border-radius:3px;">
-                <button class="btn-act btn-act-pre" id="btn-adv" onclick="toggleAdvantage('adv')">Adv</button>
-                <button class="btn-act btn-act-pre" id="btn-dis" onclick="toggleAdvantage('dis')">Dis</button>
-            </div>
-        </div>
-        <div class="roll-result-display" id="roll-res">
-            ☀️ Divine censor glowing. Prepare your holy wrath or cast your spells!
-        </div>
-    </section>
-
-    <div class="main-layout">
-        <!-- LEFT COLUMN -->
-        <div>
-            <!-- VITALS 4-BOX -->
-            <div class="vitals-4box">
-                <div class="vital-mini-box"><span style="font-size:0.65rem; color:var(--text-dim);">HIT POINTS</span><div id="hp-disp" style="font-size:1.1rem; font-weight:700; color:var(--accent-green);">10/10</div></div>
-                <div class="vital-mini-box"><span style="font-size:0.65rem; color:var(--text-dim);">ARMOR CLASS</span><div style="font-size:1.1rem; font-weight:700; color:var(--accent-radiant);">16</div></div>
-                <div class="vital-mini-box" onclick="rollD20('Initiative Check (+2)', 2)" style="cursor:pointer;"><span style="font-size:0.65rem; color:var(--text-dim);">INIT 🎲</span><div style="font-size:1.1rem; font-weight:700; color:var(--accent-blue);">+2</div></div>
-                <div class="vital-mini-box"><span style="font-size:0.65rem; color:var(--text-dim);">SPELL DC / HIT</span><div style="font-size:0.85rem; font-weight:700; color:var(--accent-radiant);">DC 13 | +5</div></div>
-            </div>
-
-            <!-- HP CONTROLLER -->
-            <div class="hp-ctrl-container">
-                <div class="hp-health-bar-bg"><div class="hp-health-bar-fill" id="hp-bar" style="width:100%;"></div></div>
-                <div style="display:flex; gap:6px;">
-                    <input type="number" id="hp-input" placeholder="Amount..." style="flex:1; background:#000; color:#fff; border:1px solid #555; padding:3px; border-radius:3px; text-align:center;">
-                    <button class="btn-act btn-act-dmg" onclick="applyDamage()">💥 Take Dmg</button>
-                    <button class="btn-act btn-act-heal" onclick="applyHeal()">💚 Heal</button>
-                </div>
-                <div style="display:flex; justify-content:space-between;">
-                    <button class="btn-act btn-act-dmg" onclick="stepHP(-1)">-1 HP</button>
-                    <button class="btn-act btn-act-heal" onclick="stepHP(1)">+1 HP</button>
-                    <button class="btn-act btn-act-pre" onclick="takeShortRest()">☕ Short Rest</button>
-                    <button class="btn-act btn-act-pre" onclick="resetHP()">⛺ Long Rest</button>
-                </div>
-            </div>
-
-            <!-- WARDING FLARE POWER (3/DAY) -->
-            <div class="panel" style="padding:6px 10px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-size:0.75rem; font-weight:700; color:var(--accent-radiant);">✨ Warding Flare (Reaction)</div>
-                        <div style="font-size:0.66rem; color:var(--text-dim);">Blind attacker to impose Disadvantage (3/Day)</div>
-                    </div>
-                    <button class="btn-act btn-act-pre" id="flare-btn" onclick="useWardingFlare()" style="color:var(--accent-radiant);">✨ Use Flare (<span id="flare-count">3</span>/3)</button>
-                </div>
-            </div>
-
-            <!-- ABILITIES -->
-            <div class="ability-strip">
-                <div class="ability-box" onclick="rollD20('STR Check', 1)"><div style="font-size:0.65rem;">STR</div><div style="font-weight:700;">12</div><div style="font-size:0.7rem;">+1</div></div>
-                <div class="ability-box" onclick="rollD20('DEX Check', 2)"><div style="font-size:0.65rem;">DEX</div><div style="font-weight:700;">14</div><div style="font-size:0.7rem;">+2</div></div>
-                <div class="ability-box" onclick="rollD20('CON Check', 2)"><div style="font-size:0.65rem;">CON</div><div style="font-weight:700;">14</div><div style="font-size:0.7rem;">+2</div></div>
-                <div class="ability-box" onclick="rollD20('INT Check', -1)"><div style="font-size:0.65rem;">INT</div><div style="font-weight:700;">8</div><div style="font-size:0.7rem;">-1</div></div>
-                <div class="ability-box active-key" onclick="rollD20('WIS Check (Key)', 3)"><div style="font-size:0.65rem; color:var(--accent-radiant);">WIS ★</div><div style="font-weight:700; color:var(--accent-radiant);">16</div><div style="font-size:0.7rem; color:var(--accent-radiant);">+3</div></div>
-                <div class="ability-box" onclick="rollD20('CHA Check', 0)"><div style="font-size:0.65rem;">CHA</div><div style="font-weight:700;">10</div><div style="font-size:0.7rem;">+0</div></div>
-            </div>
-
-            <!-- SAVES & SKILLS -->
-            <div class="panel">
-                <div class="panel-title"><span>🛡️ Saves & Proficiencies</span></div>
-                <ul class="stat-row-list">
-                    <li class="stat-row-item prof-item" onclick="rollD20('WIS Save ★', 5)"><span>Wisdom Save ★</span><span>+5 🎲</span></li>
-                    <li class="stat-row-item prof-item" onclick="rollD20('CHA Save ★', 2)"><span>Charisma Save ★</span><span>+2 🎲</span></li>
-                    <li class="stat-row-item prof-item" onclick="rollD20('Religion (INT) ★', 1)"><span>Religion (INT) ★</span><span>+1 🎲</span></li>
-                    <li class="stat-row-item prof-item" onclick="rollD20('Insight (WIS) ★', 5)"><span>Insight (WIS) ★</span><span>+5 🎲</span></li>
-                    <li class="stat-row-item prof-item" onclick="rollD20('Medicine (WIS) ★', 5)"><span>Medicine (WIS) ★</span><span>+5 🎲</span></li>
-                    <li class="stat-row-item" onclick="rollD20('Perception (WIS)', 3)"><span>Perception (WIS)</span><span>+3 🎲</span></li>
-                </ul>
-            </div>
-
-            <!-- BEGINNER'S GUIDE -->
-            <div class="panel">
-                <div class="panel-title"><span>📖 Nun's Combat Doctrine</span></div>
-                <div class="newbie-box">
-                    <strong>1. The 4d6 Guiding Bolt Nuke:</strong> You are a DPS monster! Fire <em>Guiding Bolt</em> to deal huge 4d6 Radiant damage. The next ally attacking the target gains <strong>Advantage</strong>!<br><br>
-                    <strong>2. Bonus Action Healing:</strong> Cast <em>Healing Word</em> using a <strong>Bonus Action</strong> so you can still swing your mace or cast a cantrip on the same turn!<br><br>
-                    <strong>3. Warding Flare Defense:</strong> When an enemy attacks you, use your <strong>Reaction</strong> to blind them with sunlight!
-                </div>
-            </div>
-        </div>
-
-        <!-- RIGHT COLUMN -->
-        <div>
-            <!-- AT-WILL ACTIONS & CANTRIPS -->
-            <div class="panel">
-                <div class="panel-title"><span>☀️ Holy Cantrips & Mace Strikes</span><span style="font-size:0.7rem; color:var(--accent-radiant);">Unlimited</span></div>
-                <div class="action-grid-2col">
-                    <!-- Sacred Flame -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#fde047;">🔥 Sacred Flame <span style="font-size:0.65rem; color:#f59e0b;">(Cantrip • 1 Act)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">60ft. Target makes <strong>DC 13 DEX Save</strong> (ignores cover!) or takes <strong>1d8 Radiant Damage</strong>.</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action btn-roll-radiant" onclick="rollFormulaDamage('Sacred Flame', 8, 0, 'Radiant')">💥 1d8 Radiant</button>
-                        </div>
-                    </div>
-                    <!-- Word of Radiance -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#fde047;">✨ Word of Radiance <span style="font-size:0.65rem; color:#f59e0b;">(Cantrip • 1 Act)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">5ft Burst. All chosen enemies make <strong>DC 13 CON Save</strong> or take <strong>1d6 Radiant Damage</strong>.</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action btn-roll-radiant" onclick="rollFormulaDamage('Word of Radiance', 6, 0, 'Radiant')">💥 1d6 Burst</button>
-                        </div>
-                    </div>
-                    <!-- Heavy Mace -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#cbd5e1;">🔨 Consecrated Mace <span style="font-size:0.65rem; color:#94a3b8;">(Melee • 1 Act)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">Melee 5ft. +3 to Hit, <strong>1d6 + 1 Bludgeoning</strong>.</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action" onclick="rollD20('Mace Attack', 3)">🔨 Attack (+3)</button>
-                            <button class="btn-roll-action btn-roll-dmg" onclick="rollFormulaDamage('Mace Damage', 6, 1, 'Bludgeoning')">💥 1d6+1</button>
-                        </div>
-                    </div>
-                    <!-- Guidance -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#38bdf8;">🙏 Guidance <span style="font-size:0.65rem; color:#38bdf8;">(Cantrip • 1 Act • Touch)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">Touch ally. Grants <strong>+1d4</strong> to their next ability check!</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action" onclick="rollFormulaDamage('Guidance Blessing', 4, 0, 'Bonus')">🎲 Roll +1d4</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- LEVEL 1 DIVINE SPELLS -->
-            <div class="panel">
-                <div class="panel-title">
-                    <span>⚡ 1st-Level Divine Spells</span>
-                    <span id="slot-disp" style="font-size:0.74rem; color:var(--accent-radiant);">Slots: 🟦 🟦 (2/2)</span>
-                </div>
-                <div class="action-grid-2col">
-                    <!-- Guiding Bolt -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#fde047;">⚡ Guiding Bolt <span style="font-size:0.65rem; color:#f59e0b;">(1st Lvl • 1 Act)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">120ft. +5 Spell Attack. Deals <strong>4d6 Radiant Damage</strong> & next attack against target has <strong>Advantage</strong>!</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action btn-roll-radiant" onclick="castSlotSpell('Guiding Bolt Attack', 5)">🎯 Cast & Attack (+5)</button>
-                            <button class="btn-roll-action btn-roll-radiant" onclick="rollGuidingBoltDmg()">💥 4d6 Radiant</button>
-                        </div>
-                    </div>
-                    <!-- Inflict Wounds -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#ef4444;">💀 Inflict Wounds <span style="font-size:0.65rem; color:#f87171;">(1st Lvl • 1 Act • Touch)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">Melee Touch. +5 Hit. Chunnels devastating dark energy dealing <strong>3d10 Necrotic Damage</strong>!</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action btn-roll-dmg" onclick="castSlotSpell('Inflict Wounds Attack', 5)">🎯 Touch (+5)</button>
-                            <button class="btn-roll-action btn-roll-dmg" onclick="rollInflictWoundsDmg()">💥 3d10 Dmg</button>
-                        </div>
-                    </div>
-                    <!-- Burning Hands -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#f97316;">🔥 Burning Hands <span style="font-size:0.65rem; color:#f97316;">(1st Lvl Domain • 1 Act)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">15ft Cone. DC 13 DEX Save. Deals <strong>3d6 Fire Damage</strong> (half on save).</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action btn-roll-fire" onclick="castBurningHands()">🔥 Cast 3d6 Cone</button>
-                        </div>
-                    </div>
-                    <!-- Healing Word -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#22c55e;">💚 Healing Word <span style="font-size:0.65rem; color:#4ade80;">(1st Lvl • BONUS ACT)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">60ft. Bonus Action! Instantly heals an ally for <strong>1d4 + 3 HP</strong>.</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action" style="background:#059669;" onclick="castHealingWord()">💚 Heal 1d4+3 (Bonus Act)</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- INVENTORY & PURSE -->
-            <div class="panel">
-                <div class="panel-title"><span>🎒 Vestments & Holy Relics</span><span style="color:var(--accent-radiant); font-size:0.75rem;">💰 12 GP • 5 SP</span></div>
-                <div style="font-size:0.74rem; color:var(--text-dim); display:flex; flex-direction:column; gap:3px;">
-                    <div>• 🛡️ <strong>Chain Shirt & Steel Shield:</strong> Base AC 16.</div>
-                    <div>• ☀️ <strong>Sun-Emblazoned Holy Symbol:</strong> Focus for casting divine spells.</div>
-                    <div>• 🧪 <strong>Potion of Healing (x1):</strong> Restores 2d4+2 HP when consumed.</div>
-                    <div>• 📖 <strong>Sacred Book of Hours:</strong> Prayer manual and catechism.</div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+    
+    <div class="dice-result-box">
+      <div>
+        <div class="dice-roll-name" id="rollName">Ready to Cast & Strike</div>
+        <div class="dice-roll-calc" id="rollCalc">Click any action, skill, save, or die below</div>
+      </div>
+      <div class="dice-roll-total" id="rollTotal">--</div>
+    </div>
+
+    <div class="quick-dice-bar">
+      <button class="q-die-btn" onclick="rollDie(4)">d4</button>
+      <button class="q-die-btn" onclick="rollDie(6)">d6</button>
+      <button class="q-die-btn" onclick="rollDie(8)">d8</button>
+      <button class="q-die-btn" onclick="rollDie(10)">d10</button>
+      <button class="q-die-btn" onclick="rollDie(12)">d12</button>
+      <button class="q-die-btn" onclick="rollDie(20)">d20</button>
+      <button class="q-die-btn" onclick="rollDie(100)">d100</button>
+    </div>
+  </div>
+
+  <!-- CHARACTER HEADER -->
+  <div class="char-header">
+    <div class="char-title-group">
+      <h1>Sister Beatrice</h1>
+      <div class="char-subtitle">Holy Battle Nun of the Dawn • Inquisitor of the Sun</div>
+      <div class="char-tags">
+        <span class="badge badge-class">Cleric 1 (Light Domain)</span>
+        <span class="badge badge-race">Human</span>
+        <span class="badge badge-align">Lawful Neutral</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-export" onclick="exportData()">📋 Export Data</button>
+      <div style="font-size:0.7rem; color:var(--text-dim); text-align:right;">Level 1 • Proficiency +2</div>
+    </div>
+  </div>
+
+  <!-- 4-BOX VITALS ROW -->
+  <div class="vitals-row">
+    <div class="vital-box">
+      <div class="vital-label">HIT POINTS</div>
+      <div class="vital-value" id="dispHP">10 / 10</div>
+      <div class="vital-sub" id="dispTempHP">+0 Temp HP</div>
+    </div>
+    <div class="vital-box">
+      <div class="vital-label">ARMOR CLASS</div>
+      <div class="vital-value" id="dispAC">16</div>
+      <div class="vital-sub">Scale Mail + Shield</div>
+    </div>
+    <div class="vital-box clickable" onclick="rollInit()">
+      <div class="vital-label">INITIATIVE 🎲</div>
+      <div class="vital-value">+1</div>
+      <div class="vital-sub">DEX Mod</div>
+    </div>
+    <div class="vital-box clickable" onclick="rollSpellSave()">
+      <div class="vital-label">SPELL DC / HIT</div>
+      <div class="vital-value">13 / +5</div>
+      <div class="vital-sub">WIS Spellcasting</div>
+    </div>
+  </div>
+
+  <!-- HP & TEMP HP CONTROLLER -->
+  <div class="hp-tracker-card">
+    <div class="hp-section-title">
+      <span>HEALTH CONTROLLER</span>
+      <span id="hpPercentText">100%</span>
+    </div>
+    <div class="hp-bar-container">
+      <div class="hp-bar-fill" id="hpBarFill"></div>
+    </div>
+
+    <div class="hp-controls-grid">
+      <!-- Damage / Heal -->
+      <div>
+        <div class="hp-section-title"><span>Apply Damage / Heal</span></div>
+        <div class="stepper-row">
+          <button class="step-btn btn-damage" onclick="applyDamage()">💥 Take Dmg</button>
+          <input type="number" class="step-input" id="hpDeltaInput" value="5" min="1">
+          <button class="step-btn btn-heal" onclick="applyHeal()">💚 Heal</button>
+        </div>
+      </div>
+      <!-- Temp HP -->
+      <div>
+        <div class="hp-section-title"><span>Temporary HP</span></div>
+        <div class="stepper-row">
+          <input type="number" class="step-input" id="tempHpInput" value="4" min="1">
+          <button class="step-btn" onclick="setTempHP()">🛡️ Set Temp HP</button>
+          <button class="step-btn" onclick="clearTempHP()">✕ Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hp-quick-actions">
+      <button class="btn-quick-action" onclick="takeShortRest()">☕ Short Rest (1d8+2)</button>
+      <button class="btn-quick-action" onclick="longRest()">🛌 Long Rest (Full Reset)</button>
+    </div>
+  </div>
+
+  <!-- BUFF TOGGLES & HELP TOKENS -->
+  <div class="toggles-tokens-card">
+    <div>
+      <div class="hp-section-title"><span>ACTIVE BUFFS</span></div>
+      <div class="buff-toggle-row">
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleShieldOfFaith" onchange="toggleShieldOfFaith()">
+          <span class="toggle-slider"></span>
+        </label>
+        <div>
+          <div style="font-size:0.85rem; font-weight:bold; color:#fff;">🛡️ Shield of Faith (+2 AC)</div>
+          <div style="font-size:0.7rem; color:var(--text-muted);">Bonus action concentration • Boosts AC to 18</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="hp-section-title">
+        <span>HELP TOKENS (+1d6 to ally)</span>
+        <span id="helpTokenCount">2 / 2</span>
+      </div>
+      <div class="token-boxes">
+        <div class="token-dot" id="tok1" onclick="useHelpToken(1)"></div>
+        <div class="token-dot" id="tok2" onclick="useHelpToken(2)"></div>
+        <button class="step-btn" style="padding:2px 8px; font-size:0.7rem; margin-left:8px;" onclick="resetHelpTokens()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 ABILITY SCORES -->
+  <div class="stats-grid">
+    <div class="stat-box" onclick="rollStat('Strength Check', 1)">
+      <div class="stat-abbr">STR</div>
+      <div class="stat-mod">+1</div>
+      <div class="stat-score">13</div>
+    </div>
+    <div class="stat-box" onclick="rollStat('Dexterity Check', 1)">
+      <div class="stat-abbr">DEX</div>
+      <div class="stat-mod">+1</div>
+      <div class="stat-score">12</div>
+    </div>
+    <div class="stat-box" onclick="rollStat('Constitution Check', 2)">
+      <div class="stat-abbr">CON</div>
+      <div class="stat-mod">+2</div>
+      <div class="stat-score">14</div>
+    </div>
+    <div class="stat-box" onclick="rollStat('Intelligence Check', 0)">
+      <div class="stat-abbr">INT</div>
+      <div class="stat-mod">+0</div>
+      <div class="stat-score">10</div>
+    </div>
+    <div class="stat-box" onclick="rollStat('Wisdom Check', 3)">
+      <div class="stat-abbr">WIS</div>
+      <div class="stat-mod">+3</div>
+      <div class="stat-score">16</div>
+    </div>
+    <div class="stat-box" onclick="rollStat('Charisma Check', 0)">
+      <div class="stat-abbr">CHA</div>
+      <div class="stat-mod">+0</div>
+      <div class="stat-score">10</div>
+    </div>
+  </div>
+
+  <!-- SAVING THROWS -->
+  <div class="saves-card">
+    <div class="saves-title">SAVING THROWS (Proficient in WIS & CHA)</div>
+    <div class="saves-grid">
+      <div class="save-pill" onclick="rollSave('Strength Save', 1)">
+        <div class="save-pill-name">STR</div>
+        <div class="save-pill-val">+1</div>
+      </div>
+      <div class="save-pill" onclick="rollSave('Dexterity Save', 1)">
+        <div class="save-pill-name">DEX</div>
+        <div class="save-pill-val">+1</div>
+      </div>
+      <div class="save-pill" onclick="rollSave('Constitution Save', 2)">
+        <div class="save-pill-name">CON</div>
+        <div class="save-pill-val">+2</div>
+      </div>
+      <div class="save-pill" onclick="rollSave('Intelligence Save', 0)">
+        <div class="save-pill-name">INT</div>
+        <div class="save-pill-val">+0</div>
+      </div>
+      <div class="save-pill prof" onclick="rollSave('Wisdom Save (Proficient)', 5)">
+        <div class="save-pill-name">WIS ★</div>
+        <div class="save-pill-val">+5</div>
+      </div>
+      <div class="save-pill prof" onclick="rollSave('Charisma Save (Proficient)', 2)">
+        <div class="save-pill-name">CHA ★</div>
+        <div class="save-pill-val">+2</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 18 SKILLS -->
+  <div class="skills-card">
+    <div class="saves-title">SKILLS & PROFICIENCIES</div>
+    <div class="skills-grid">
+      <div class="skill-btn" onclick="rollSkill('Acrobatics', 1)"><div class="skill-left"><span class="skill-stat">DEX</span> Acrobatics</div><div class="skill-val">+1</div></div>
+      <div class="skill-btn" onclick="rollSkill('Animal Handling', 3)"><div class="skill-left"><span class="skill-stat">WIS</span> Animal Handling</div><div class="skill-val">+3</div></div>
+      <div class="skill-btn" onclick="rollSkill('Arcana', 0)"><div class="skill-left"><span class="skill-stat">INT</span> Arcana</div><div class="skill-val">+0</div></div>
+      <div class="skill-btn" onclick="rollSkill('Athletics', 1)"><div class="skill-left"><span class="skill-stat">STR</span> Athletics</div><div class="skill-val">+1</div></div>
+      <div class="skill-btn" onclick="rollSkill('Deception', 0)"><div class="skill-left"><span class="skill-stat">CHA</span> Deception</div><div class="skill-val">+0</div></div>
+      <div class="skill-btn" onclick="rollSkill('History', 0)"><div class="skill-left"><span class="skill-stat">INT</span> History</div><div class="skill-val">+0</div></div>
+      <div class="skill-btn prof" onclick="rollSkill('Insight', 5)"><div class="skill-left"><span class="skill-prof-star">★</span><span class="skill-stat">WIS</span> Insight</div><div class="skill-val">+5</div></div>
+      <div class="skill-btn" onclick="rollSkill('Intimidation', 0)"><div class="skill-left"><span class="skill-stat">CHA</span> Intimidation</div><div class="skill-val">+0</div></div>
+      <div class="skill-btn" onclick="rollSkill('Investigation', 0)"><div class="skill-left"><span class="skill-stat">INT</span> Investigation</div><div class="skill-val">+0</div></div>
+      <div class="skill-btn prof" onclick="rollSkill('Medicine', 5)"><div class="skill-left"><span class="skill-prof-star">★</span><span class="skill-stat">WIS</span> Medicine</div><div class="skill-val">+5</div></div>
+      <div class="skill-btn" onclick="rollSkill('Nature', 0)"><div class="skill-left"><span class="skill-stat">INT</span> Nature</div><div class="skill-val">+0</div></div>
+      <div class="skill-btn prof" onclick="rollSkill('Perception', 5)"><div class="skill-left"><span class="skill-prof-star">★</span><span class="skill-stat">WIS</span> Perception</div><div class="skill-val">+5</div></div>
+      <div class="skill-btn" onclick="rollSkill('Performance', 0)"><div class="skill-left"><span class="skill-stat">CHA</span> Performance</div><div class="skill-val">+0</div></div>
+      <div class="skill-btn" onclick="rollSkill('Persuasion', 0)"><div class="skill-left"><span class="skill-stat">CHA</span> Persuasion</div><div class="skill-val">+0</div></div>
+      <div class="skill-btn prof" onclick="rollSkill('Religion', 2)"><div class="skill-left"><span class="skill-prof-star">★</span><span class="skill-stat">INT</span> Religion</div><div class="skill-val">+2</div></div>
+      <div class="skill-btn" onclick="rollSkill('Sleight of Hand', 1)"><div class="skill-left"><span class="skill-stat">DEX</span> Sleight of Hand</div><div class="skill-val">+1</div></div>
+      <div class="skill-btn" onclick="rollSkill('Stealth', 1)"><div class="skill-left"><span class="skill-stat">DEX</span> Stealth</div><div class="skill-val">+1</div></div>
+      <div class="skill-btn" onclick="rollSkill('Survival', 3)"><div class="skill-left"><span class="skill-stat">WIS</span> Survival</div><div class="skill-val">+3</div></div>
+    </div>
+  </div>
+
+  <!-- GOLD PURSE -->
+  <div class="gold-card">
+    <div class="gold-display">
+      <div class="gold-coin-stack">💰</div>
+      <div>
+        <div style="font-size:0.7rem; color:var(--text-muted); font-weight:bold; text-transform:uppercase;">PURSE (10 SP = 1 GP)</div>
+        <div class="gold-numbers" id="goldPurseDisp">14 GP, 5 SP</div>
+      </div>
+    </div>
+    <div class="gold-steppers">
+      <button class="g-btn" onclick="modGold(-1, 0)">-1 GP</button>
+      <button class="g-btn" onclick="modGold(1, 0)">+1 GP</button>
+      <button class="g-btn" onclick="modGold(0, -1)">-1 SP</button>
+      <button class="g-btn" onclick="modGold(0, 1)">+1 SP</button>
+      <button class="g-btn" onclick="openLedger()">📜 Ledger</button>
+    </div>
+  </div>
+
+  <!-- SPELL SLOTS TRACKER -->
+  <div>
+    <div class="section-title">
+      <span>SPELL SLOTS & PREPARATIONS</span>
+      <span style="font-size:0.75rem; color:var(--text-muted);">WIS Mod (+3) + Lvl (1) = 4 Prepared + 2 Domain</span>
+    </div>
+    <div class="spell-slots-grid">
+      <div class="spell-slot-box">
+        <div class="spell-slot-tier">1ST LEVEL (2 SLOTS)</div>
+        <div class="spell-slot-bubbles">
+          <div class="slot-bubble" id="slot1_1" onclick="toggleSlot(1, 1)"></div>
+          <div class="slot-bubble" id="slot1_2" onclick="toggleSlot(1, 2)"></div>
+        </div>
+        <div style="font-size:0.65rem; color:var(--text-dim);">Available for Nukes & Heals</div>
+      </div>
+      <div class="spell-slot-box locked">
+        <div class="spell-slot-tier">2ND LEVEL (LOCKED)</div>
+        <div class="spell-slot-bubbles">
+          <div class="slot-bubble used" style="cursor:not-allowed;"></div>
+          <div class="slot-bubble used" style="cursor:not-allowed;"></div>
+        </div>
+        <div style="font-size:0.65rem; color:var(--text-dim);">Unlocks at Cleric Level 3</div>
+      </div>
+      <div class="spell-slot-box locked">
+        <div class="spell-slot-tier">3RD LEVEL (LOCKED)</div>
+        <div class="spell-slot-bubbles">
+          <div class="slot-bubble used" style="cursor:not-allowed;"></div>
+          <div class="slot-bubble used" style="cursor:not-allowed;"></div>
+        </div>
+        <div style="font-size:0.65rem; color:var(--text-dim);">Unlocks at Cleric Level 5</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLASS FEATURES / RELICS -->
+  <div>
+    <div class="section-title"><span>DOMAIN & CLASS FEATURES</span></div>
+    
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">☀️ Warding Flare</span>
+          <span class="action-badge badge-reaction">Reaction • 3/Day</span>
+        </div>
+        <div class="action-desc-short">When an attacker within 30 ft you can see attacks you, cause Disadvantage on their roll before it hits!</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="useWardingFlare()">☀️ Flare (<span id="flareUsesDisp">3</span>/3)</button>
+        <button class="btn-info-act" onclick="openModal('wardingFlare')">ℹ️</button>
+      </div>
+    </div>
+
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">🕯️ Light Cantrip Bonus</span>
+          <span class="action-badge badge-action">At-Will</span>
+        </div>
+        <div class="action-desc-short">Touch an object to emit bright light in a 20-foot radius and dim light for an additional 20 feet.</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="castLight()">🕯️ Cast</button>
+        <button class="btn-info-act" onclick="openModal('lightCantrip')">ℹ️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS & COMBAT SPELLS -->
+  <div>
+    <div class="section-title"><span>ACTIONS & COMBAT SPELLS</span></div>
+
+    <!-- Guiding Bolt -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">⚡ Guiding Bolt</span>
+          <span class="action-badge badge-action">1st Level • 1 Action</span>
+        </div>
+        <div class="action-desc-short">Ranged Spell Attack (+5 to hit, 120ft). 4d6 Radiant damage! Next attack roll against target has Advantage.</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="castGuidingBolt()">⚡ Cast (4d6)</button>
+        <button class="btn-info-act" onclick="openModal('guidingBolt')">ℹ️</button>
+      </div>
+    </div>
+
+    <!-- Inflict Wounds -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">💀 Inflict Wounds</span>
+          <span class="action-badge badge-action">1st Level • 1 Action</span>
+        </div>
+        <div class="action-desc-short">Melee Spell Attack (+5 to hit, Touch). 3d10 Necrotic damage nuke! Channel holy decay into enemies.</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="castInflictWounds()">💀 Cast (3d10)</button>
+        <button class="btn-info-act" onclick="openModal('inflictWounds')">ℹ️</button>
+      </div>
+    </div>
+
+    <!-- Burning Hands -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">🔥 Burning Hands (Domain)</span>
+          <span class="action-badge badge-action">1st Level • 1 Action</span>
+        </div>
+        <div class="action-desc-short">15ft Cone AOE. DC 13 DEX Save. 3d6 Fire damage on fail, half on success. Ignites flammable objects.</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="castBurningHands()">🔥 Cast (3d6 AOE)</button>
+        <button class="btn-info-act" onclick="openModal('burningHands')">ℹ️</button>
+      </div>
+    </div>
+
+    <!-- Sacred Flame -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">🔥 Sacred Flame</span>
+          <span class="action-badge badge-action">Cantrip • 1 Action</span>
+        </div>
+        <div class="action-desc-short">Target within 60ft makes DC 13 DEX Save or takes 1d8 Radiant damage. Ignores cover!</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="castSacredFlame()">🔥 1d8 Radiant</button>
+        <button class="btn-info-act" onclick="openModal('sacredFlame')">ℹ️</button>
+      </div>
+    </div>
+
+    <!-- Toll the Dead -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">🔔 Toll the Dead</span>
+          <span class="action-badge badge-action">Cantrip • 1 Action</span>
+        </div>
+        <div class="action-desc-short">Target within 60ft makes DC 13 WIS Save. Takes 1d8 Necrotic (or 1d12 if missing any HP!).</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="castTollTheDead()">🔔 1d8/1d12 Necro</button>
+        <button class="btn-info-act" onclick="openModal('tollTheDead')">ℹ️</button>
+      </div>
+    </div>
+
+    <!-- Healing Word -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">💚 Healing Word</span>
+          <span class="action-badge badge-bonus">1st Level • Bonus Action</span>
+        </div>
+        <div class="action-desc-short">Target creature within 60ft regains 1d4 + 3 HP. Fast emergency recovery.</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="castHealingWord()">💚 1d4+3 Heal</button>
+        <button class="btn-info-act" onclick="openModal('healingWord')">ℹ️</button>
+      </div>
+    </div>
+
+    <!-- Heavy Iron Mace -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">🔨 Heavy Iron Mace</span>
+          <span class="action-badge badge-action">Melee • 1 Action</span>
+        </div>
+        <div class="action-desc-short">Melee Weapon Attack (+3 to hit, Reach 5ft). Deals 1d6 + 1 Bludgeoning damage.</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="attackMace()">🔨 Attack (+3)</button>
+        <button class="btn-info-act" onclick="openModal('mace')">ℹ️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVENTORY -->
+  <div class="inventory-card">
+    <div class="inv-header">
+      <span class="section-title" style="margin:0;">📦 EQUIPMENT & INVENTORY</span>
+      <span style="font-size:0.75rem; color:var(--text-muted);" id="invCountDisp">12 Items</span>
+    </div>
+    <div class="inv-input-row">
+      <input type="text" class="inv-input" id="newInvInput" placeholder="Add new item (e.g. 2x Holy Water, Silver Censer)...">
+      <button class="btn-add-inv" onclick="addItemFromInput()">+ Add</button>
+    </div>
+    <div class="inv-list" id="invListContainer">
+      <!-- Items dynamically populated -->
+    </div>
+  </div>
+
+</div>
+
+<!-- COMPENDIUM MODAL -->
+<div class="modal-overlay" id="compendiumModal" onclick="closeModal(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-title" id="modalTitle">Spell / Feature Name</div>
+    <div class="modal-pills" id="modalPills"></div>
+    <div class="modal-stat-grid" id="modalStats"></div>
+    <div class="modal-desc" id="modalDesc">Detailed rules text and beginner guidance.</div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
 </div>
 
 <script>
-    let curHP = 10, maxHP = 10, slots = 2, maxSlots = 2, flares = 3, rollMode = 'norm';
+/* ==================== STATE ENGINE ==================== */
+const STORAGE_KEY = 'dnd_beatrice_sheet_state';
 
-    function updateHPUI() {
-        document.getElementById('hp-bar').style.width = `${(curHP / maxHP) * 100}%`;
-        const d = document.getElementById('hp-disp');
-        d.innerText = `${curHP}/${maxHP}`;
-        d.style.color = curHP > 5 ? 'var(--accent-green)' : 'var(--accent-red)';
+const defaultState = {
+  currentHP: 10,
+  maxHP: 10,
+  tempHP: 0,
+  shieldOfFaith: false,
+  goldGP: 14,
+  goldSP: 5,
+  helpTokens: 2,
+  maxHelpTokens: 2,
+  wardingFlare: 3,
+  maxWardingFlare: 3,
+  slotsLevel1: [true, true],
+  inventory: [
+    { name: "Scale Mail Armor (AC 14)", qty: 1, desc: "Medium armor giving 14 AC. Disadvantage on stealth checks." },
+    { name: "Holy Steel Shield (+2 AC)", qty: 1, desc: "Embossed with the Radiant Sun emblem of the Dawn." },
+    { name: "Heavy Iron Mace", qty: 1, desc: "1d6+1 bludgeoning melee weapon with sanctified head." },
+    { name: "Light Crossbow", qty: 1, desc: "1d8+1 piercing ranged weapon (80/320 ft)." },
+    { name: "Crossbow Bolts", qty: 20, desc: "Standard ammunition." },
+    { name: "Silver Censer & Holy Incense", qty: 5, desc: "Used for rituals, purifications, and casting light/bless." },
+    { name: "Reliquary Amulet (Holy Symbol)", qty: 1, desc: "Focus for casting divine cleric spells." },
+    { name: "Healer's Kit", qty: 10, desc: "10 uses. Stabilize dying allies instantly without a Medicine check." },
+    { name: "Potion of Healing", qty: 1, desc: "Action to drink. Restores 2d4 + 2 HP immediately." },
+    { name: "Holy Water Flask", qty: 2, desc: "Can be thrown (20ft) dealing 2d6 radiant to fiends/undead." },
+    { name: "Priest's Robes & Vestments", qty: 1, desc: "Clean white and gold ecclesiastical attire." },
+    { name: "Backpack & Explorer's Rations", qty: 5, desc: "5 days of trail rations, waterskin, and bedroll." }
+  ],
+  ledger: [
+    "Starting Gold: 14 GP, 5 SP from Church of the Dawn"
+  ]
+};
+
+let state = loadState();
+
+function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try { return JSON.parse(saved); } catch (e) { console.error(e); }
+  }
+  return JSON.parse(JSON.stringify(defaultState));
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  renderAll();
+}
+
+/* ==================== DICE & CONSOLE ==================== */
+let advMode = 'normal'; // 'normal', 'adv', 'dis'
+
+function toggleAdv(mode) {
+  const btnA = document.getElementById('btnAdv');
+  const btnD = document.getElementById('btnDis');
+  if (advMode === mode) {
+    advMode = 'normal';
+    btnA.classList.remove('active-adv');
+    btnD.classList.remove('active-dis');
+  } else {
+    advMode = mode;
+    btnA.classList.toggle('active-adv', mode === 'adv');
+    btnD.classList.toggle('active-dis', mode === 'dis');
+  }
+}
+
+function rollD20(mod, label) {
+  let r1 = Math.floor(Math.random() * 20) + 1;
+  let r2 = Math.floor(Math.random() * 20) + 1;
+  let finalD20 = r1;
+  let detail = `1d20 (${r1}) + ${mod}`;
+  
+  if (advMode === 'adv') {
+    finalD20 = Math.max(r1, r2);
+    detail = `ADV: [${r1}, ${r2}] ➔ ${finalD20} + ${mod}`;
+  } else if (advMode === 'dis') {
+    finalD20 = Math.min(r1, r2);
+    detail = `DIS: [${r1}, ${r2}] ➔ ${finalD20} + ${mod}`;
+  }
+
+  let total = finalD20 + mod;
+  let totalEl = document.getElementById('rollTotal');
+  totalEl.className = 'dice-roll-total';
+
+  if (finalD20 === 20) {
+    totalEl.classList.add('crit-success');
+    detail += " • CRITICAL HIT! 🌟";
+  } else if (finalD20 === 1) {
+    totalEl.classList.add('crit-fail');
+    detail += " • NATURAL 1! 💀";
+  }
+
+  document.getElementById('rollName').textContent = label;
+  document.getElementById('rollCalc').textContent = detail;
+  totalEl.textContent = total;
+}
+
+function rollDie(sides) {
+  let r = Math.floor(Math.random() * sides) + 1;
+  document.getElementById('rollName').textContent = `Rolled 1d${sides}`;
+  document.getElementById('rollCalc').textContent = `Result on d${sides}`;
+  document.getElementById('rollTotal').className = 'dice-roll-total';
+  document.getElementById('rollTotal').textContent = r;
+}
+
+function rollStat(name, mod) { rollD20(mod, name); }
+function rollSave(name, mod) { rollD20(mod, name); }
+function rollSkill(name, mod) { rollD20(mod, `${name} Check`); }
+function rollInit() { rollD20(1, 'Initiative Check'); }
+function rollSpellSave() { rollD20(5, 'Spell Attack Roll'); }
+
+/* ==================== COMBAT ACTIONS & ROLLS ==================== */
+function attackMace() {
+  rollD20(3, 'Heavy Iron Mace Attack');
+  setTimeout(() => {
+    let dmg = Math.floor(Math.random() * 6) + 1 + 1;
+    document.getElementById('rollCalc').textContent += ` ➔ Damage: 1d6+1 = ${dmg} Bludgeoning`;
+  }, 100);
+}
+
+function castGuidingBolt() {
+  rollD20(5, 'Guiding Bolt Attack (120ft)');
+  setTimeout(() => {
+    let d1 = Math.floor(Math.random()*6)+1;
+    let d2 = Math.floor(Math.random()*6)+1;
+    let d3 = Math.floor(Math.random()*6)+1;
+    let d4 = Math.floor(Math.random()*6)+1;
+    let total = d1 + d2 + d3 + d4;
+    document.getElementById('rollCalc').textContent += ` ➔ Dmg: 4d6 [${d1},${d2},${d3},${d4}] = ${total} Radiant (Grants ADV to next ally!)`;
+  }, 100);
+}
+
+function castInflictWounds() {
+  rollD20(5, 'Inflict Wounds Melee Spell Attack');
+  setTimeout(() => {
+    let d1 = Math.floor(Math.random()*10)+1;
+    let d2 = Math.floor(Math.random()*10)+1;
+    let d3 = Math.floor(Math.random()*10)+1;
+    let total = d1 + d2 + d3;
+    document.getElementById('rollCalc').textContent += ` ➔ Dmg: 3d10 [${d1},${d2},${d3}] = ${total} Necrotic Nuke!`;
+  }, 100);
+}
+
+function castBurningHands() {
+  let d1 = Math.floor(Math.random()*6)+1;
+  let d2 = Math.floor(Math.random()*6)+1;
+  let d3 = Math.floor(Math.random()*6)+1;
+  let total = d1 + d2 + d3;
+  document.getElementById('rollName').textContent = '🔥 Burning Hands (15ft Cone AOE)';
+  document.getElementById('rollCalc').textContent = `DC 13 DEX Save. Dmg: 3d6 [${d1},${d2},${d3}] (Half on save)`;
+  document.getElementById('rollTotal').className = 'dice-roll-total';
+  document.getElementById('rollTotal').textContent = total + ' Fire';
+}
+
+function castSacredFlame() {
+  let dmg = Math.floor(Math.random() * 8) + 1;
+  document.getElementById('rollName').textContent = '🔥 Sacred Flame (60ft)';
+  document.getElementById('rollCalc').textContent = 'Target makes DC 13 DEX Save (Ignores Cover!). On fail:';
+  document.getElementById('rollTotal').className = 'dice-roll-total';
+  document.getElementById('rollTotal').textContent = dmg + ' Radiant';
+}
+
+function castTollTheDead() {
+  let d8 = Math.floor(Math.random() * 8) + 1;
+  let d12 = Math.floor(Math.random() * 12) + 1;
+  document.getElementById('rollName').textContent = '🔔 Toll the Dead (60ft)';
+  document.getElementById('rollCalc').textContent = `Target makes DC 13 WIS Save. Full HP: ${d8} (1d8) | Damaged: ${d12} (1d12)`;
+  document.getElementById('rollTotal').className = 'dice-roll-total';
+  document.getElementById('rollTotal').textContent = `${d12} Necrotic`;
+}
+
+function castHealingWord() {
+  let heal = Math.floor(Math.random() * 4) + 1 + 3;
+  document.getElementById('rollName').textContent = '💚 Healing Word (60ft Bonus Action)';
+  document.getElementById('rollCalc').textContent = '1d4 + 3 (WIS Mod) Healing';
+  document.getElementById('rollTotal').className = 'dice-roll-total';
+  document.getElementById('rollTotal').textContent = `+${heal} HP`;
+}
+
+function castLight() {
+  document.getElementById('rollName').textContent = '🕯️ Cast Light Cantrip';
+  document.getElementById('rollCalc').textContent = 'Touch object: 20ft bright light + 20ft dim light (1 Hour)';
+  document.getElementById('rollTotal').textContent = 'Active';
+}
+
+function useWardingFlare() {
+  if (state.wardingFlare > 0) {
+    state.wardingFlare--;
+    saveState();
+    document.getElementById('rollName').textContent = '☀️ Warding Flare Triggered!';
+    document.getElementById('rollCalc').textContent = `Attacker within 30ft has DISADVANTAGE on their attack! (${state.wardingFlare}/3 left)`;
+    document.getElementById('rollTotal').textContent = 'DISADV';
+  } else {
+    alert('No Warding Flare uses remaining! Regain all on Long Rest.');
+  }
+}
+
+/* ==================== HP & VITALS ==================== */
+function applyDamage() {
+  let val = parseInt(document.getElementById('hpDeltaInput').value) || 0;
+  if (val <= 0) return;
+  
+  if (state.tempHP > 0) {
+    if (val <= state.tempHP) {
+      state.tempHP -= val;
+      val = 0;
+    } else {
+      val -= state.tempHP;
+      state.tempHP = 0;
     }
+  }
+  
+  state.currentHP = Math.max(0, state.currentHP - val);
+  saveState();
+}
 
-    function applyDamage() {
-        const inp = document.getElementById('hp-input');
-        const dmg = parseInt(inp.value) || 1;
-        inp.value = '';
-        curHP = Math.max(0, curHP - dmg);
-        updateHPUI();
-        logRoll(`💥 Took ${dmg} damage! HP: ${curHP}/${maxHP}`);
+function applyHeal() {
+  let val = parseInt(document.getElementById('hpDeltaInput').value) || 0;
+  if (val <= 0) return;
+  state.currentHP = Math.min(state.maxHP, state.currentHP + val);
+  saveState();
+}
+
+function setTempHP() {
+  let val = parseInt(document.getElementById('tempHpInput').value) || 0;
+  state.tempHP = val;
+  saveState();
+}
+
+function clearTempHP() {
+  state.tempHP = 0;
+  saveState();
+}
+
+function takeShortRest() {
+  let roll = Math.floor(Math.random() * 8) + 1 + 2;
+  state.currentHP = Math.min(state.maxHP, state.currentHP + roll);
+  saveState();
+  document.getElementById('rollName').textContent = '☕ Short Rest Taken';
+  document.getElementById('rollCalc').textContent = `Spent 1d8 Hit Die + 2 CON mod = Restored ${roll} HP`;
+  document.getElementById('rollTotal').textContent = `+${roll} HP`;
+}
+
+function longRest() {
+  if (confirm('Take a Long Rest? Resets HP to full, restores all spell slots, warding flare uses, and help tokens.')) {
+    state.currentHP = state.maxHP;
+    state.tempHP = 0;
+    state.slotsLevel1 = [true, true];
+    state.wardingFlare = 3;
+    state.helpTokens = 2;
+    saveState();
+    document.getElementById('rollName').textContent = '🛌 Long Rest Completed';
+    document.getElementById('rollCalc').textContent = 'Full HP, all spell slots & class abilities refreshed!';
+    document.getElementById('rollTotal').textContent = '100%';
+  }
+}
+
+/* ==================== BUFFS & TOKENS ==================== */
+function toggleShieldOfFaith() {
+  state.shieldOfFaith = document.getElementById('toggleShieldOfFaith').checked;
+  saveState();
+}
+
+function useHelpToken(id) {
+  if (id <= state.helpTokens) {
+    state.helpTokens--;
+    let r = Math.floor(Math.random() * 6) + 1;
+    document.getElementById('rollName').textContent = '🤝 Help Token Granted to Ally!';
+    document.getElementById('rollCalc').textContent = `Ally adds +1d6 (${r}) to their next roll!`;
+    document.getElementById('rollTotal').textContent = `+${r}`;
+  } else {
+    state.helpTokens = Math.min(state.maxHelpTokens, state.helpTokens + 1);
+  }
+  saveState();
+}
+
+function resetHelpTokens() {
+  state.helpTokens = state.maxHelpTokens;
+  saveState();
+}
+
+/* ==================== SPELL SLOTS ==================== */
+function toggleSlot(lvl, idx) {
+  if (lvl === 1) {
+    state.slotsLevel1[idx - 1] = !state.slotsLevel1[idx - 1];
+    saveState();
+  }
+}
+
+/* ==================== GOLD & INVENTORY ==================== */
+function modGold(gp, sp) {
+  state.goldGP += gp;
+  state.goldSP += sp;
+  
+  if (state.goldSP >= 10) {
+    state.goldGP += Math.floor(state.goldSP / 10);
+    state.goldSP = state.goldSP % 10;
+  } else if (state.goldSP < 0) {
+    let borrow = Math.ceil(Math.abs(state.goldSP) / 10);
+    if (state.goldGP >= borrow) {
+      state.goldGP -= borrow;
+      state.goldSP += borrow * 10;
+    } else {
+      state.goldSP = 0;
+      state.goldGP = 0;
     }
+  }
+  
+  state.goldGP = Math.max(0, state.goldGP);
+  state.ledger.unshift(`Gold Change: ${gp > 0 ? '+' : ''}${gp} GP, ${sp > 0 ? '+' : ''}${sp} SP (Total: ${state.goldGP} GP, ${state.goldSP} SP)`);
+  if (state.ledger.length > 30) state.ledger.pop();
+  saveState();
+}
 
-    function applyHeal() {
-        const inp = document.getElementById('hp-input');
-        const h = parseInt(inp.value) || 1;
-        inp.value = '';
-        curHP = Math.min(maxHP, curHP + h);
-        updateHPUI();
-        logRoll(`💚 Healed +${h} HP! HP: ${curHP}/${maxHP}`);
-    }
+function openLedger() {
+  let text = state.ledger.join('
+');
+  alert("📜 TRANSACTION LEDGER:
 
-    function stepHP(d) { curHP = Math.max(0, Math.min(maxHP, curHP + d)); updateHPUI(); }
-    function takeShortRest() { curHP = Math.min(maxHP, curHP + 4); updateHPUI(); logRoll('☕ Regained +4 HP on Short Rest.'); }
-    function resetHP() { curHP = maxHP; slots = maxSlots; flares = 3; document.getElementById('flare-count').innerText = '3'; updateSlotDisp(); updateHPUI(); logRoll('⛺ Full Long Rest complete! HP, Spell Slots & Flares restored.'); }
+" + (text || "No transactions recorded yet."));
+}
 
-    function updateSlotDisp() {
-        document.getElementById('slot-disp').innerText = `Slots: ${slots === 2 ? '🟦 🟦 (2/2)' : slots === 1 ? '🟦 ⬛ (1/2)' : '⬛ ⬛ (0/2)'}`;
-    }
+function addItemFromInput() {
+  let val = document.getElementById('newInvInput').value.trim();
+  if (!val) return;
+  
+  let qty = 1;
+  let match = val.match(/^(\d+)[xX]\s*(.+)/);
+  let name = val;
+  if (match) {
+    qty = parseInt(match[1]);
+    name = match[2].trim();
+  }
+  
+  state.inventory.push({ name: name, qty: qty, desc: "Adventuring equipment." });
+  document.getElementById('newInvInput').value = '';
+  saveState();
+}
 
-    function useWardingFlare() {
-        if (flares <= 0) { logRoll('⚠️ 0 Warding Flares left today!'); return; }
-        flares--;
-        document.getElementById('flare-count').innerText = flares;
-        logRoll(`✨ <strong>WARDING FLARE TRIGGERED (Reaction):</strong> You flash blinding sunlight in the attacker's face! The enemy's attack has <span style="color:var(--accent-radiant); font-weight:700;">DISADVANTAGE</span>! (${flares}/3 left)`);
-    }
+function modInvQty(idx, delta) {
+  state.inventory[idx].qty += delta;
+  if (state.inventory[idx].qty <= 0) {
+    state.inventory.splice(idx, 1);
+  }
+  saveState();
+}
 
-    function castSlotSpell(name, mod) {
-        if (slots <= 0) { logRoll('⚠️ 0 Spell Slots remaining!'); return; }
-        slots--;
-        updateSlotDisp();
-        rollD20(name + ' (-1 Slot)', mod);
-    }
+function openItemModal(idx) {
+  let item = state.inventory[idx];
+  openCustomModal(item.name, ["Equipment", `Qty: ${item.qty}`], { "Item Type": "Inventory Gear", "Status": "Carried" }, item.desc, null);
+}
 
-    function rollGuidingBoltDmg() {
-        let t = 0, rolls = [];
-        for (let i = 0; i < 4; i++) { const r = Math.floor(Math.random()*6)+1; rolls.push(r); t += r; }
-        logRoll(`⚡ <strong>Guiding Bolt Damage:</strong> [${rolls.join('+')}] = <span style="color:var(--accent-radiant); font-weight:700;">${t} Radiant Damage</span>! Next attack vs target has <strong>ADVANTAGE</strong>!`);
-    }
+/* ==================== EXPORT DATA ==================== */
+function exportData() {
+  let ac = state.shieldOfFaith ? 18 : 16;
+  let text = `Sister Beatrice (Cleric 1 - Light Domain)
+HP: ${state.currentHP}/${state.maxHP} (+${state.tempHP} Temp) | AC: ${ac}
+1st Lvl Slots: ${state.slotsLevel1.filter(Boolean).length}/2
+Warding Flare: ${state.wardingFlare}/3 | Help Tokens: ${state.helpTokens}/2
+Gold: ${state.goldGP} GP, ${state.goldSP} SP
+Active Buffs: ${state.shieldOfFaith ? 'Shield of Faith (+2 AC)' : 'None'}`;
+  
+  navigator.clipboard.writeText(text).then(() => {
+    alert("📋 Data copied to clipboard for Lead DM / Story Log:
 
-    function rollInflictWoundsDmg() {
-        let t = 0, rolls = [];
-        for (let i = 0; i < 3; i++) { const r = Math.floor(Math.random()*10)+1; rolls.push(r); t += r; }
-        logRoll(`💀 <strong>Inflict Wounds Damage:</strong> [${rolls.join('+')}] = <span style="color:#ef4444; font-weight:700;">${t} Necrotic Damage</span>!`);
-    }
+" + text);
+  }).catch(() => {
+    alert("Character Summary:
 
-    function castBurningHands() {
-        if (slots <= 0) { logRoll('⚠️ 0 Spell Slots remaining!'); return; }
-        slots--;
-        updateSlotDisp();
-        let t = 0, rolls = [];
-        for (let i = 0; i < 3; i++) { const r = Math.floor(Math.random()*6)+1; rolls.push(r); t += r; }
-        logRoll(`🔥 <strong>Burning Hands Cast (15ft Cone):</strong> [${rolls.join('+')}] = <span style="color:#f97316; font-weight:700;">${t} Fire Damage</span> (DC 13 DEX save for half)!`);
-    }
+" + text);
+  });
+}
 
-    function castHealingWord() {
-        if (slots <= 0) { logRoll('⚠️ 0 Spell Slots remaining!'); return; }
-        slots--;
-        updateSlotDisp();
-        const r = Math.floor(Math.random()*4)+1;
-        logRoll(`💚 <strong>Healing Word Cast (Bonus Action):</strong> Heals ally for [d4:${r} + 3] = <span style="color:#22c55e; font-weight:700;">+${r+3} HP</span>!`);
-    }
+/* ==================== COMPENDIUM MODAL DATA ==================== */
+const compendium = {
+  wardingFlare: {
+    title: "☀️ Warding Flare (Light Domain)",
+    pills: ["Reaction", "Light Domain", "3/Day"],
+    stats: { "Range": "30 Feet", "Uses": "3 per Long Rest (WIS Mod)", "Trigger": "Attacked by visible creature", "Effect": "Impose Disadvantage on attack" },
+    desc: "When you are attacked by a creature within 30 feet of you that you can see, you can use your reaction to cause the light of the sun to flare before the attacker. The creature has disadvantage on the attack roll before it hits or misses.",
+    action: { name: "Trigger Warding Flare", fn: "useWardingFlare()" }
+  },
+  lightCantrip: {
+    title: "🕯️ Light (Bonus Domain Cantrip)",
+    pills: ["Cantrip", "Evocation", "1 Action"],
+    stats: { "Casting Time": "1 Action", "Range": "Touch", "Duration": "1 Hour", "Components": "V, M (Firefly)" },
+    desc: "You touch one object that is no larger than 10 feet in any dimension. Until the spell ends, the object sheds bright light in a 20-foot radius and dim light for an additional 20 feet. The light can be colored as you like.",
+    action: { name: "Cast Light", fn: "castLight()" }
+  },
+  guidingBolt: {
+    title: "⚡ Guiding Bolt",
+    pills: ["1st Level", "Evocation", "1 Action", "Nuke"],
+    stats: { "Range": "120 Feet", "Damage": "4d6 Radiant", "Attack": "Ranged Spell (+5)", "Bonus": "Advantage on next ally attack" },
+    desc: "A flash of light streaks toward a creature within range. Make a ranged spell attack against the target (+5 to hit). On a hit, the target takes 4d6 radiant damage, and the next attack roll made against this target before the end of your next turn has advantage, thanks to the mystical dim light glittering on the target.",
+    action: { name: "Cast Guiding Bolt (4d6)", fn: "castGuidingBolt()" }
+  },
+  inflictWounds: {
+    title: "💀 Inflict Wounds",
+    pills: ["1st Level", "Necromancy", "1 Action", "Melee Nuke"],
+    stats: { "Range": "Touch", "Damage": "3d10 Necrotic", "Attack": "Melee Spell (+5)", "Scaling": "+1d10 per higher slot" },
+    desc: "Make a melee spell attack (+5 to hit) against a creature you can reach. On a hit, the target takes 3d10 necrotic damage. One of the highest single-target damage spells available at 1st level in D&D 5e!",
+    action: { name: "Cast Inflict Wounds (3d10)", fn: "castInflictWounds()" }
+  },
+  burningHands: {
+    title: "🔥 Burning Hands (Light Domain Spell)",
+    pills: ["1st Level", "Evocation", "1 Action", "AOE"],
+    stats: { "Range": "Self (15ft cone)", "Damage": "3d6 Fire", "Save": "DC 13 DEX (Half)", "Effect": "Ignites flammable objects" },
+    desc: "As you hold your hands with thumbs touching and fingers spread, a thin sheet of flames shoots forth from your outstretched fingertips. Each creature in a 15-foot cone must make a Dexterity saving throw (DC 13). A creature takes 3d6 fire damage on a failed save, or half as much on a successful one.",
+    action: { name: "Cast Burning Hands (3d6)", fn: "castBurningHands()" }
+  },
+  sacredFlame: {
+    title: "🔥 Sacred Flame",
+    pills: ["Cantrip", "Evocation", "1 Action"],
+    stats: { "Range": "60 Feet", "Damage": "1d8 Radiant", "Save": "DC 13 DEX", "Special": "Ignores Cover" },
+    desc: "Flame-like radiance descends on a creature that you can see within range. The target must succeed on a DC 13 Dexterity saving throw or take 1d8 radiant damage. The target gains no benefit from cover for this saving throw.",
+    action: { name: "Cast Sacred Flame", fn: "castSacredFlame()" }
+  },
+  tollTheDead: {
+    title: "🔔 Toll the Dead",
+    pills: ["Cantrip", "Necromancy", "1 Action"],
+    stats: { "Range": "60 Feet", "Damage": "1d8 / 1d12 Necrotic", "Save": "DC 13 WIS", "Trigger": "1d12 if missing any HP" },
+    desc: "You point at one creature you can see within range, and the sound of a dolorous bell fills the air around it. The target must succeed on a DC 13 Wisdom saving throw or take 1d8 necrotic damage. If the target is missing any of its hit points, it instead takes 1d12 necrotic damage.",
+    action: { name: "Cast Toll the Dead", fn: "castTollTheDead()" }
+  },
+  healingWord: {
+    title: "💚 Healing Word",
+    pills: ["1st Level", "Evocation", "Bonus Action"],
+    stats: { "Range": "60 Feet", "Healing": "1d4 + 3 HP", "Casting Time": "1 Bonus Action", "Components": "V (Verbal only)" },
+    desc: "A creature of your choice that you can see within range regains hit points equal to 1d4 + your spellcasting ability modifier (+3). You can cast this as a bonus action, leaving your main action free to attack or cast a cantrip.",
+    action: { name: "Cast Healing Word", fn: "castHealingWord()" }
+  },
+  mace: {
+    title: "🔨 Heavy Iron Mace",
+    pills: ["Simple Melee Weapon", "Bludgeoning"],
+    stats: { "Attack Mod": "+3 to hit (STR)", "Damage": "1d6 + 1 Bludgeoning", "Reach": "5 Feet", "Weight": "4 lbs" },
+    desc: "A solid steel-flanged mace sanctified by the Church of the Dawn. Used when holy spells run dry or enemies enter close melee quarters.",
+    action: { name: "Swing Mace (+3)", fn: "attackMace()" }
+  }
+};
 
-    function logRoll(msg) {
-        const r = document.getElementById('roll-res');
-        r.innerHTML = msg;
-        r.classList.remove('highlight-roll');
-        void r.offsetWidth;
-        r.classList.add('highlight-roll');
-    }
+function openModal(key) {
+  let c = compendium[key];
+  if (!c) return;
+  openCustomModal(c.title, c.pills, c.stats, c.desc, c.action);
+}
 
-    function toggleAdvantage(m) {
-        rollMode = rollMode === m ? 'norm' : m;
-        document.getElementById('btn-adv').style.background = rollMode === 'adv' ? 'var(--accent-green)' : '#2a2213';
-        document.getElementById('btn-dis').style.background = rollMode === 'dis' ? 'var(--accent-red)' : '#2a2213';
-    }
+function openCustomModal(title, pills, stats, desc, action) {
+  document.getElementById('modalTitle').textContent = title;
+  
+  let pContainer = document.getElementById('modalPills');
+  pContainer.innerHTML = pills.map(p => `<span class="badge badge-class">${p}</span>`).join('');
+  
+  let sContainer = document.getElementById('modalStats');
+  sContainer.innerHTML = Object.entries(stats).map(([k, v]) => `<div><span style="color:var(--text-muted);">${k}:</span> <strong style="color:#fff;">${v}</strong></div>`).join('');
+  
+  document.getElementById('modalDesc').textContent = desc;
+  
+  let aContainer = document.getElementById('modalActions');
+  if (action) {
+    aContainer.innerHTML = `<button class="btn-modal-roll" onclick="${action.fn}; closeModalDirect();">${action.name}</button>`;
+  } else {
+    aContainer.innerHTML = '';
+  }
+  
+  document.getElementById('compendiumModal').style.display = 'flex';
+}
 
-    function rollCustomDie(s) {
-        const mod = parseInt(document.getElementById('dice-mod').value) || 0;
-        const roll = Math.floor(Math.random() * s) + 1;
-        logRoll(`🎲 <strong>d${s} Roll:</strong> (${roll}) = <span style="color:var(--accent-radiant); font-weight:700;">${roll+mod}</span>`);
-    }
+function closeModal(e) {
+  if (e.target.id === 'compendiumModal') closeModalDirect();
+}
 
-    function rollD20(label, mod) {
-        const extra = parseInt(document.getElementById('dice-mod').value) || 0;
-        const total = mod + extra;
-        const r1 = Math.floor(Math.random() * 20) + 1;
-        const r2 = Math.floor(Math.random() * 20) + 1;
-        let c = rollMode === 'adv' ? Math.max(r1, r2) : rollMode === 'dis' ? Math.min(r1, r2) : r1;
-        logRoll(`🎯 <strong>${label}:</strong> d20(${c}) ${total>=0?'+'+total:total} = <span style="color:var(--accent-radiant); font-weight:700;">${c+total}</span>`);
-    }
+function closeModalDirect() {
+  document.getElementById('compendiumModal').style.display = 'none';
+}
 
-    function rollFormulaDamage(label, sides, bonus, type) {
-        const r = Math.floor(Math.random() * sides) + 1;
-        logRoll(`💥 <strong>${label}:</strong> [d${sides}:${r} + ${bonus}] = <span style="color:var(--accent-radiant); font-weight:700;">${r+bonus}</span> ${type} Damage`);
-    }
+/* ==================== RENDER ALL ==================== */
+function renderAll() {
+  // HP & Vitals
+  document.getElementById('dispHP').textContent = `${state.currentHP} / ${state.maxHP}`;
+  document.getElementById('dispTempHP').textContent = `+${state.tempHP} Temp HP`;
+  let pct = Math.round((state.currentHP / state.maxHP) * 100);
+  document.getElementById('hpPercentText').textContent = `${pct}%`;
+  document.getElementById('hpBarFill').style.width = `${pct}%`;
+  
+  // AC
+  let ac = 16;
+  if (state.shieldOfFaith) ac += 2;
+  document.getElementById('dispAC').textContent = ac;
+  document.getElementById('toggleShieldOfFaith').checked = state.shieldOfFaith;
+  
+  // Help Tokens
+  document.getElementById('helpTokenCount').textContent = `${state.helpTokens} / ${state.maxHelpTokens}`;
+  document.getElementById('tok1').className = `token-dot ${state.helpTokens >= 1 ? '' : 'spent'}`;
+  document.getElementById('tok2').className = `token-dot ${state.helpTokens >= 2 ? '' : 'spent'}`;
+  
+  // Warding Flare
+  document.getElementById('flareUsesDisp').textContent = state.wardingFlare;
+  
+  // Spell Slots
+  document.getElementById('slot1_1').className = `slot-bubble ${state.slotsLevel1[0] ? '' : 'used'}`;
+  document.getElementById('slot1_2').className = `slot-bubble ${state.slotsLevel1[1] ? '' : 'used'}`;
+  
+  // Gold
+  document.getElementById('goldPurseDisp').textContent = `${state.goldGP} GP, ${state.goldSP} SP`;
+  
+  // Inventory
+  document.getElementById('invCountDisp').textContent = `${state.inventory.length} Items`;
+  let invContainer = document.getElementById('invListContainer');
+  invContainer.innerHTML = state.inventory.map((item, idx) => `
+    <div class="inv-item-row">
+      <div class="inv-item-left" onclick="openItemModal(${idx})">
+        <span style="color:var(--accent-gold);">•</span>
+        <span><strong>${item.qty > 1 ? item.qty + 'x ' : ''}${item.name}</strong></span>
+      </div>
+      <div class="inv-steppers">
+        <button class="inv-btn" onclick="modInvQty(${idx}, -1)">-</button>
+        <span style="font-size:0.75rem; font-weight:bold; min-width:18px; text-align:center;">${item.qty}</span>
+        <button class="inv-btn" onclick="modInvQty(${idx}, 1)">+</button>
+      </div>
+    </div>
+  `).join('');
+}
 
-    function exportSheetState() {
-        const str = `☀️ SISTER BEATRICE [HP: ${curHP}/${maxHP} | AC: 16 | Slots: L1(${slots}/2) | Flares: ${flares}/3] • 📦 Inventory: (No changes)`;
-        navigator.clipboard.writeText(str).then(() => logRoll(`📋 <strong>Exported:</strong> ${str}`));
-    }
+// Initial render
+renderAll();
 </script>
+
 </body>
 </html>

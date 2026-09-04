@@ -1,353 +1,1844 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sir Valerius — Level 1 Frontline Paladin</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-page: #080c14;
-            --bg-sheet: #0e1422;
-            --panel-bg: #151e32;
-            --panel-sub: #101726;
-            --card-border: #222e47;
-            --accent-gold: #f59e0b;
-            --accent-paladin: #38bdf8;
-            --accent-green: #22c55e;
-            --accent-red: #ef4444;
-            --text-light: #f8fafc;
-            --text-dim: #94a3b8;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-page); color: var(--text-light); line-height: 1.5; padding: 16px 12px; display: flex; justify-content: center; font-size: 0.88rem; }
-        .sheet-container { width: 100%; max-width: 1180px; background-color: var(--bg-sheet); border: 1px solid var(--card-border); border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.85); overflow: hidden; }
-        .header-banner { background: linear-gradient(180deg, #18253f 0%, #0e1422 100%); border-bottom: 1px solid var(--card-border); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .header-title h1 { font-family: 'Cinzel', serif; color: var(--accent-paladin); font-size: 1.65rem; font-weight: 700; display: flex; align-items: center; gap: 8px; text-shadow: 0 0 14px rgba(56, 189, 248, 0.35); }
-        .pill-badge { padding: 4px 11px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
-        .pill-good { background: #075985; color: #e0f2fe; border: 1px solid #0284c7; }
-        .top-dice-console { background: #080c16; border-bottom: 1px solid var(--card-border); padding: 10px 18px; display: flex; flex-direction: column; gap: 8px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.5); }
-        .dice-controls-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-        .dice-btn { background: var(--panel-bg); border: 1px solid var(--card-border); color: var(--text-light); padding: 4px 10px; border-radius: 5px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
-        .dice-btn:hover { border-color: var(--accent-paladin); color: var(--accent-paladin); background: rgba(56, 189, 248, 0.1); }
-        .roll-result-display { background: linear-gradient(135deg, #101a2e 0%, #090f1e 100%); border: 1.5px solid var(--card-border); border-radius: 6px; padding: 8px 14px; font-size: 0.92rem; min-height: 40px; display: flex; align-items: center; }
-        .roll-result-display.highlight-roll { border-color: var(--accent-paladin); box-shadow: 0 0 14px rgba(56, 189, 248, 0.35); }
-        .main-layout { display: grid; grid-template-columns: 340px 1fr; gap: 14px; padding: 14px 18px; }
-        @media (max-width: 960px) { .main-layout { grid-template-columns: 1fr; } }
-        .panel { background-color: var(--panel-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
-        .panel-title { font-size: 0.84rem; font-weight: 700; color: var(--accent-paladin); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 5px; text-transform: uppercase; }
-        .vitals-4box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
-        .vital-mini-box { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 6px 3px; text-align: center; }
-        .hp-ctrl-container { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 8px 10px; display: flex; flex-direction: column; gap: 7px; }
-        .hp-health-bar-bg { width: 100%; height: 9px; background: #080c16; border-radius: 4px; overflow: hidden; border: 1px solid var(--card-border); }
-        .hp-health-bar-fill { height: 100%; width: 100%; background: var(--accent-green); transition: width 0.3s; }
-        .btn-act { padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: none; }
-        .btn-act-dmg { background: #991b1b; color: #fee2e2; }
-        .btn-act-heal { background: #065f46; color: #d1fae5; }
-        .btn-act-pre { background: #1e293b; color: var(--text-light); border: 1px solid var(--card-border); }
-        .ability-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
-        .ability-box { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 5px; text-align: center; padding: 5px 2px; cursor: pointer; }
-        .ability-box.active-key { border: 1.5px solid var(--accent-paladin); background: rgba(56, 189, 248, 0.1); }
-        .stat-row-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
-        .stat-row-item { font-size: 0.76rem; padding: 3px 7px; background: var(--panel-sub); border-radius: 4px; display: flex; justify-content: space-between; cursor: pointer; }
-        .stat-row-item.prof-item { color: var(--accent-paladin); font-weight: 600; border-left: 3px solid var(--accent-paladin); }
-        .action-grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
-        @media (max-width: 600px) { .action-grid-2col { grid-template-columns: 1fr; } }
-        .action-card { background-color: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 7px 9px; display: flex; flex-direction: column; gap: 4px; }
-        .btn-roll-action { background: #0284c7; color: #fff; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.72rem; font-weight: 600; cursor: pointer; }
-        .btn-roll-dmg { background: #991b1b; color: #fee2e2; }
-        .newbie-box { background: rgba(56, 189, 248, 0.08); border-left: 3px solid var(--accent-paladin); border-radius: 4px; padding: 8px 10px; font-size: 0.75rem; color: #e0f2fe; line-height: 1.45; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sir Valerius - D&D 5e Character Sheet</title>
+<style>
+:root {
+  --bg-primary: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-card: #21262d;
+  --bg-card-hover: #30363d;
+  --accent-gold: #e5a93c;
+  --accent-gold-glow: rgba(229, 169, 60, 0.35);
+  --accent-blue: #58a6ff;
+  --accent-blue-glow: rgba(88, 166, 255, 0.35);
+  --accent-crimson: #f85149;
+  --accent-green: #3fb950;
+  --text-main: #f0f6fc;
+  --text-muted: #8b949e;
+  --text-dim: #6e7681;
+  --border-subtle: #30363d;
+  --border-gold: #8a6824;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-display: 'Cinzel', Georgia, serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-main);
+  font-family: var(--font-main);
+  line-height: 1.5;
+  padding: 12px;
+  padding-bottom: 60px;
+}
+
+.sheet-container {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* TOP CONSOLE */
+.dice-console {
+  background: linear-gradient(135deg, #161b22 0%, #1f242c 100%);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.console-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 6px;
+}
+
+.console-title {
+  font-family: var(--font-display);
+  color: var(--accent-gold);
+  font-size: 0.95rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.console-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.adv-dis-toggle {
+  display: flex;
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.adv-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.adv-btn.active-adv { background: #238636; color: #fff; }
+.adv-btn.active-dis { background: #da3633; color: #fff; }
+
+.dice-result-box {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 52px;
+}
+
+.dice-roll-name {
+  font-weight: 600;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.dice-roll-calc {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.dice-roll-total {
+  font-size: 1.8rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: var(--accent-gold);
+  text-shadow: 0 0 10px var(--accent-gold-glow);
+}
+
+.crit-success { color: #3fb950 !important; text-shadow: 0 0 12px rgba(63, 185, 80, 0.6) !important; }
+.crit-fail { color: #f85149 !important; text-shadow: 0 0 12px rgba(248, 81, 73, 0.6) !important; }
+
+.quick-dice-bar {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.q-die-btn {
+  flex: 1;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-gold);
+  border-radius: var(--radius-sm);
+  padding: 5px 0;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s;
+  min-width: 44px;
+}
+
+.q-die-btn:hover {
+  background: var(--accent-gold);
+  color: #000;
+}
+
+/* HEADER CARD */
+.char-header {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.char-title-group h1 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.char-subtitle {
+  color: var(--accent-gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.char-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-class { background: rgba(229, 169, 60, 0.2); color: #e5a93c; border: 1px solid rgba(229, 169, 60, 0.4); }
+.badge-race { background: rgba(88, 166, 255, 0.2); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.4); }
+.badge-align { background: rgba(63, 185, 80, 0.2); color: #3fb950; border: 1px solid rgba(63, 185, 80, 0.4); }
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.btn-export {
+  background: linear-gradient(135deg, #238636, #2ea043);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 8px rgba(35, 134, 54, 0.3);
+}
+
+.btn-export:hover { filter: brightness(1.1); }
+
+/* 4-BOX VITALS ROW */
+.vitals-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.vital-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 8px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.vital-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.vital-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: #fff;
+  margin-top: 2px;
+}
+
+.vital-box.clickable {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.vital-box.clickable:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-gold);
+}
+
+.vital-sub {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+}
+
+/* HP & TEMP HP CONTROLLER */
+.hp-tracker-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+}
+
+.hp-bar-container {
+  background: #111;
+  border-radius: 10px;
+  height: 14px;
+  overflow: hidden;
+  margin: 8px 0 12px;
+  border: 1px solid var(--border-subtle);
+  position: relative;
+}
+
+.hp-bar-fill {
+  background: linear-gradient(90deg, #da3633, #238636);
+  height: 100%;
+  width: 100%;
+  transition: width 0.3s ease;
+}
+
+.hp-controls-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .hp-controls-grid { grid-template-columns: 1fr; }
+  .vitals-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+.hp-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.step-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.step-btn:hover { background: var(--bg-card-hover); border-color: var(--accent-gold); }
+
+.step-input {
+  width: 50px;
+  background: #111;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: bold;
+  padding: 5px 0;
+}
+
+.btn-damage { background: rgba(218, 54, 51, 0.3); border-color: #da3633; color: #ff7b72; }
+.btn-heal { background: rgba(35, 134, 54, 0.3); border-color: #238636; color: #7ee787; }
+
+.hp-quick-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.btn-quick-action {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 5px 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-quick-action:hover { color: #fff; border-color: var(--text-muted); }
+
+/* LAY ON HANDS POOL CONTROLLER */
+.lay-on-hands-card {
+  background: linear-gradient(135deg, #1b241e 0%, #161b22 100%);
+  border: 1px solid #238636;
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+}
+
+.pool-bar-container {
+  background: #111;
+  border-radius: 8px;
+  height: 10px;
+  overflow: hidden;
+  margin: 6px 0 10px;
+  border: 1px solid var(--border-subtle);
+}
+
+.pool-bar-fill {
+  background: linear-gradient(90deg, #2ea043, #56d364);
+  height: 100%;
+  width: 100%;
+  transition: width 0.3s ease;
+}
+
+/* BUFF TOGGLES & HELP TOKENS */
+.toggles-tokens-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .toggles-tokens-card { grid-template-columns: 1fr; }
+}
+
+.buff-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #333;
+  transition: .3s;
+  border-radius: 24px;
+  border: 1px solid var(--border-subtle);
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: .3s;
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: var(--accent-blue);
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+.token-boxes {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.token-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-gold);
+  background: var(--accent-gold);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0 6px var(--accent-gold-glow);
+}
+
+.token-dot.spent {
+  background: transparent;
+  box-shadow: none;
+  border-color: var(--text-dim);
+}
+
+/* STATS & SAVES */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 650px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.stat-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.stat-box:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent-gold);
+}
+
+.stat-abbr {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.stat-mod {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: var(--font-display);
+}
+
+.stat-score {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  background: rgba(0,0,0,0.3);
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* 6 SAVING THROWS */
+.saves-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+}
+
+.saves-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.saves-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+
+@media (max-width: 650px) {
+  .saves-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.save-pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 5px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.save-pill:hover { border-color: var(--accent-gold); background: var(--bg-card-hover); }
+.save-pill.prof { border-color: var(--accent-gold); background: rgba(229, 169, 60, 0.1); }
+.save-pill-name { font-size: 0.7rem; color: var(--text-muted); }
+.save-pill.prof .save-pill-name { color: var(--accent-gold); font-weight: bold; }
+.save-pill-val { font-size: 0.95rem; font-weight: bold; color: #fff; }
+
+/* 18 SKILLS */
+.skills-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 8px;
+}
+
+@media (max-width: 700px) {
+  .skills-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .skills-grid { grid-template-columns: 1fr; }
+}
+
+.skill-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 5px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.skill-btn:hover { background: var(--bg-card-hover); border-color: var(--accent-gold); }
+.skill-btn.prof { border-color: rgba(229, 169, 60, 0.6); background: rgba(229, 169, 60, 0.08); }
+.skill-left { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: var(--text-main); }
+.skill-stat { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; }
+.skill-prof-star { color: var(--accent-gold); font-size: 0.7rem; }
+.skill-val { font-size: 0.85rem; font-weight: bold; color: var(--accent-gold); }
+
+/* GOLD PURSE */
+.gold-card {
+  background: linear-gradient(135deg, #1f1b14 0%, #26231a 100%);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.gold-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gold-coin-stack {
+  font-size: 1.6rem;
+}
+
+.gold-numbers {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--accent-gold);
+}
+
+.gold-steppers {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.g-btn {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border-gold);
+  color: var(--accent-gold);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.g-btn:hover { background: var(--accent-gold); color: #000; }
+
+/* ACTIONS & WEAPONS */
+.section-title {
+  font-family: var(--font-display);
+  color: var(--accent-gold);
+  font-size: 1.1rem;
+  margin: 10px 0 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.action-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.15s;
+}
+
+.action-card:hover { border-color: rgba(229, 169, 60, 0.4); }
+
+.action-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.action-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.action-name {
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.action-badge {
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 1px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.badge-action { background: rgba(88, 166, 255, 0.2); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.3); }
+.badge-bonus { background: rgba(63, 185, 80, 0.2); color: #3fb950; border: 1px solid rgba(63, 185, 80, 0.3); }
+.badge-reaction { background: rgba(248, 81, 73, 0.2); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.3); }
+
+.action-desc-short {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.action-right {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.btn-roll-act {
+  background: var(--bg-card);
+  border: 1px solid var(--border-gold);
+  color: var(--accent-gold);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-roll-act:hover { background: var(--accent-gold); color: #000; }
+
+.btn-info-act {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-info-act:hover { color: #fff; border-color: var(--text-main); }
+
+/* INVENTORY */
+.inventory-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+}
+
+.inv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.inv-input-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.inv-input {
+  flex: 1;
+  background: #111;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.btn-add-inv {
+  background: var(--accent-gold);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.inv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inv-item-row {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inv-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.inv-item-left:hover {
+  color: var(--accent-gold);
+}
+
+.inv-steppers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inv-btn {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.inv-btn:hover { color: #fff; border-color: var(--accent-gold); }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg);
+  max-width: 500px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 18px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.modal-close:hover { color: #fff; }
+
+.modal-title {
+  font-family: var(--font-display);
+  color: var(--accent-gold);
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+}
+
+.modal-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.modal-desc {
+  font-size: 0.88rem;
+  color: #d1d5db;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.modal-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  background: rgba(0,0,0,0.3);
+  padding: 10px;
+  border-radius: var(--radius-md);
+  margin-bottom: 14px;
+  font-size: 0.8rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-modal-roll {
+  flex: 1;
+  background: var(--accent-gold);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+</style>
 </head>
 <body>
 
 <div class="sheet-container">
-    <header class="header-banner">
-        <div>
-            <h1>🛡️ SIR VALERIUS THE STEADFAST</h1>
-            <div style="font-size:0.84rem; font-weight:700; color:#7dd3fc;">« Shield of the Helpless » • Level 1 Paladin</div>
-            <div style="font-size:0.75rem; color:var(--text-dim);">Unbreakable frontline defender who intercepts attacks aimed at allies</div>
+
+  <!-- TOP DICE CONSOLE -->
+  <div class="dice-console">
+    <div class="console-header">
+      <div class="console-title">🛡️ DICE CONSOLE</div>
+      <div class="console-controls">
+        <span>Adv / Dis:</span>
+        <div class="adv-dis-toggle">
+          <button class="adv-btn" id="btnAdv" onclick="toggleAdv('adv')">ADV</button>
+          <button class="adv-btn" id="btnDis" onclick="toggleAdv('dis')">DIS</button>
         </div>
-        <div style="display:flex; gap:6px; align-items:center;">
-            <button class="btn-act btn-act-pre" onclick="exportSheetState()" style="color:var(--accent-paladin); border-color:var(--accent-paladin);">📋 Export Data</button>
-            <span class="pill-badge pill-good">LAWFUL GOOD</span>
-            <span class="pill-badge pill-good">TANK / DEFENDER</span>
-        </div>
-    </header>
-
-    <section class="top-dice-console">
-        <div class="dice-controls-bar">
-            <div style="display:flex; gap:5px; align-items:center;">
-                <span style="font-size:0.75rem; font-weight:700; color:var(--text-dim);">🎲 Quick Roll:</span>
-                <button class="dice-btn" onclick="rollCustomDie(20)">d20</button>
-                <button class="dice-btn" onclick="rollCustomDie(10)">d10</button>
-                <button class="dice-btn" onclick="rollCustomDie(8)">d8</button>
-                <button class="dice-btn" onclick="rollCustomDie(6)">d6</button>
-                <button class="dice-btn" onclick="rollCustomDie(4)">d4</button>
-            </div>
-            <div style="display:flex; gap:5px; align-items:center;">
-                <span style="font-size:0.75rem; color:var(--text-dim);">Mod:</span>
-                <input type="number" id="dice-mod" value="0" style="width:40px; background:#000; color:#fff; border:1px solid #555; text-align:center; border-radius:3px;">
-                <button class="btn-act btn-act-pre" id="btn-adv" onclick="toggleAdvantage('adv')">Adv</button>
-                <button class="btn-act btn-act-pre" id="btn-dis" onclick="toggleAdvantage('dis')">Dis</button>
-            </div>
-        </div>
-        <div class="roll-result-display" id="roll-res">
-            🛡️ Heavy shield raised. Stand between danger and your allies!
-        </div>
-    </section>
-
-    <div class="main-layout">
-        <!-- LEFT COLUMN -->
-        <div>
-            <!-- VITALS 4-BOX -->
-            <div class="vitals-4box">
-                <div class="vital-mini-box"><span style="font-size:0.65rem; color:var(--text-dim);">HIT POINTS</span><div id="hp-disp" style="font-size:1.1rem; font-weight:700; color:var(--accent-green);">12/12</div></div>
-                <div class="vital-mini-box"><span style="font-size:0.65rem; color:var(--text-dim);">ARMOR CLASS</span><div style="font-size:1.1rem; font-weight:700; color:var(--accent-paladin);">18</div></div>
-                <div class="vital-mini-box" onclick="rollD20('Initiative Check (+0)', 0)" style="cursor:pointer;"><span style="font-size:0.65rem; color:var(--text-dim);">INIT 🎲</span><div style="font-size:1.1rem; font-weight:700; color:#cbd5e1;">+0</div></div>
-                <div class="vital-mini-box"><span style="font-size:0.65rem; color:var(--text-dim);">CRIT RANGE</span><div style="font-size:0.95rem; font-weight:700; color:var(--accent-gold);">20 ★</div></div>
-            </div>
-
-            <!-- HP CONTROLLER -->
-            <div class="hp-ctrl-container">
-                <div class="hp-health-bar-bg"><div class="hp-health-bar-fill" id="hp-bar" style="width:100%;"></div></div>
-                <div style="display:flex; gap:6px;">
-                    <input type="number" id="hp-input" placeholder="Amount..." style="flex:1; background:#000; color:#fff; border:1px solid #555; padding:3px; border-radius:3px; text-align:center;">
-                    <button class="btn-act btn-act-dmg" onclick="applyDamage()">💥 Take Dmg</button>
-                    <button class="btn-act btn-act-heal" onclick="applyHeal()">💚 Heal</button>
-                </div>
-                <div style="display:flex; justify-content:space-between;">
-                    <button class="btn-act btn-act-dmg" onclick="stepHP(-1)">-1 HP</button>
-                    <button class="btn-act btn-act-heal" onclick="stepHP(1)">+1 HP</button>
-                    <button class="btn-act btn-act-pre" onclick="takeShortRest()">☕ Short Rest</button>
-                    <button class="btn-act btn-act-pre" onclick="resetHP()">⛺ Long Rest</button>
-                </div>
-            </div>
-
-            <!-- LAY ON HANDS POOL (5 HP / DAY) -->
-            <div class="panel" style="padding:6px 10px;">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <div style="font-size:0.75rem; font-weight:700; color:var(--accent-paladin);">✨ Lay on Hands Pool</div>
-                        <div style="font-size:0.66rem; color:var(--text-dim);">Touch ally to heal or cure poison (5 HP/Day)</div>
-                    </div>
-                    <div style="display:flex; gap:3px; align-items:center;">
-                        <span id="loh-count" style="font-weight:700; color:var(--accent-paladin); margin-right:4px;">5 / 5</span>
-                        <button class="btn-act btn-act-heal" onclick="spendLayOnHands(1)" style="padding:2px 6px;">-1 HP</button>
-                        <button class="btn-act btn-act-heal" onclick="spendLayOnHands(5)" style="padding:2px 6px;">-5 HP</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ABILITIES -->
-            <div class="ability-strip">
-                <div class="ability-box active-key" onclick="rollD20('STR Check (Key)', 3)"><div style="font-size:0.65rem; color:var(--accent-paladin);">STR ★</div><div style="font-weight:700; color:var(--accent-paladin);">16</div><div style="font-size:0.7rem; color:var(--accent-paladin);">+3</div></div>
-                <div class="ability-box" onclick="rollD20('DEX Check', 0)"><div style="font-size:0.65rem;">DEX</div><div style="font-weight:700;">10</div><div style="font-size:0.7rem;">+0</div></div>
-                <div class="ability-box" onclick="rollD20('CON Check', 2)"><div style="font-size:0.65rem;">CON</div><div style="font-weight:700;">14</div><div style="font-size:0.7rem;">+2</div></div>
-                <div class="ability-box" onclick="rollD20('INT Check', -1)"><div style="font-size:0.65rem;">INT</div><div style="font-weight:700;">8</div><div style="font-size:0.7rem;">-1</div></div>
-                <div class="ability-box" onclick="rollD20('WIS Check', 0)"><div style="font-size:0.65rem;">WIS</div><div style="font-weight:700;">10</div><div style="font-size:0.7rem;">+0</div></div>
-                <div class="ability-box active-key" onclick="rollD20('CHA Check (Key)', 2)"><div style="font-size:0.65rem; color:var(--accent-paladin);">CHA ★</div><div style="font-weight:700; color:var(--accent-paladin);">14</div><div style="font-size:0.7rem; color:var(--accent-paladin);">+2</div></div>
-            </div>
-
-            <!-- SAVES & SKILLS -->
-            <div class="panel">
-                <div class="panel-title"><span>🛡️ Saves & Proficiencies</span></div>
-                <ul class="stat-row-list">
-                    <li class="stat-row-item prof-item" onclick="rollD20('WIS Save ★', 2)"><span>Wisdom Save ★</span><span>+2 🎲</span></li>
-                    <li class="stat-row-item prof-item" onclick="rollD20('CHA Save ★', 4)"><span>Charisma Save ★</span><span>+4 🎲</span></li>
-                    <li class="stat-row-item prof-item" onclick="rollD20('Athletics (STR) ★', 5)"><span>Athletics (STR) ★</span><span>+5 🎲</span></li>
-                    <li class="stat-row-item prof-item" onclick="rollD20('Persuasion (CHA) ★', 4)"><span>Persuasion (CHA) ★</span><span>+4 🎲</span></li>
-                    <li class="stat-row-item prof-item" onclick="rollD20('Intimidation (CHA) ★', 4)"><span>Intimidation (CHA) ★</span><span>+4 🎲</span></li>
-                    <li class="stat-row-item" onclick="rollD20('Insight (WIS)', 0)"><span>Insight (WIS)</span><span>+0 🎲</span></li>
-                </ul>
-            </div>
-
-            <!-- BEGINNER'S GUIDE -->
-            <div class="panel">
-                <div class="panel-title"><span>📖 Paladin's Shield Code</span></div>
-                <div class="newbie-box">
-                    <strong>1. 18 AC Frontline Fortress:</strong> With Chain Mail and your heavy shield, enemies will struggle to hit your <strong>18 AC</strong>!<br><br>
-                    <strong>2. Interception Reaction:</strong> When an enemy attacks a friend next to you, use your <strong>Reaction</strong> to block the blow, reducing their damage by <strong>1d10 + 2</strong>!<br><br>
-                    <strong>3. Level 2 Smite Preview:</strong> At Level 2, you will unlock spell slots and the iconic <em>Divine Smite</em> feature to turn any weapon hit into radiant destruction!
-                </div>
-            </div>
-        </div>
-
-        <!-- RIGHT COLUMN -->
-        <div>
-            <!-- WEAPON ATTACKS -->
-            <div class="panel">
-                <div class="panel-title"><span>⚔️ Martial Weapons & Strikes</span><span style="font-size:0.7rem; color:var(--accent-paladin);">Prof: +2</span></div>
-                <div class="action-grid-2col">
-                    <!-- Longsword (1-Hand) -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#7dd3fc;">🗡️ Steel Longsword (1-Hand) <span style="font-size:0.65rem; color:#94a3b8;">(Melee • 1 Act)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">Melee 5ft. <strong>+5 to Hit</strong>, deals <strong>1d8 + 3 Slashing Damage</strong> (while holding shield).</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action" onclick="rollD20('Longsword Attack', 5)">🗡️ Attack (+5)</button>
-                            <button class="btn-roll-action btn-roll-dmg" onclick="rollFormulaDamage('Longsword Damage (1H)', 8, 3, 'Slashing')">💥 1d8+3</button>
-                        </div>
-                    </div>
-                    <!-- Longsword (2-Hand Versatile) -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#7dd3fc;">🗡️ Longsword (2-Handed) <span style="font-size:0.65rem; color:#94a3b8;">(Melee • 1 Act)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">Melee 5ft. <strong>+5 to Hit</strong>, deals <strong>1d10 + 3 Slashing Damage</strong> (sheathing shield).</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action" onclick="rollD20('2-Hand Attack', 5)">🗡️ Attack (+5)</button>
-                            <button class="btn-roll-action btn-roll-dmg" onclick="rollFormulaDamage('Longsword Damage (2H)', 10, 3, 'Slashing')">💥 1d10+3</button>
-                        </div>
-                    </div>
-                    <!-- Javelin -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#cbd5e1;">🏹 Throwing Javelin <span style="font-size:0.65rem; color:#94a3b8;">(Ranged 30/120 • 1 Act)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">Range 30/120ft. <strong>+5 to Hit</strong>, deals <strong>1d6 + 3 Piercing Damage</strong>.</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action" onclick="rollD20('Javelin Throw', 5)">🎯 Throw (+5)</button>
-                            <button class="btn-roll-action btn-roll-dmg" onclick="rollFormulaDamage('Javelin Damage', 6, 3, 'Piercing')">💥 1d6+3</button>
-                        </div>
-                    </div>
-                    <!-- Shield Bash -->
-                    <div class="action-card">
-                        <div style="font-weight:700; color:#cbd5e1;">🛡️ Heavy Shield Bash <span style="font-size:0.65rem; color:#94a3b8;">(Melee • 1 Act)</span></div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">Melee 5ft. <strong>+5 to Hit</strong>, <strong>1d4 + 3 Bludgeoning</strong> + shove enemy 5ft or prone!</div>
-                        <div style="display:flex; gap:4px; margin-top:4px;">
-                            <button class="btn-roll-action" onclick="rollD20('Shield Bash Attack', 5)">🛡️ Bash (+5)</button>
-                            <button class="btn-roll-action btn-roll-dmg" onclick="rollFormulaDamage('Bash Damage', 4, 3, 'Bludgeoning')">💥 1d4+3</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SACRED AURA & TANK REACTIONS -->
-            <div class="panel">
-                <div class="panel-title"><span>🛡️ Holy Features & Tank Reactions</span></div>
-                <div style="display:flex; flex-direction:column; gap:6px;">
-                    <!-- Interception Fighting Stance -->
-                    <div class="action-card" style="border-left:3px solid var(--accent-paladin);">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div style="font-weight:700; color:#7dd3fc;">🛡️ Interception Fighting Stance (Reaction)</div>
-                            <button class="btn-roll-action" onclick="rollInterceptionBlock()">🛡️ Block Attack</button>
-                        </div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">When a creature you can see hits a target within 5ft of you with an attack, you intercept the blow, reducing the damage by <strong>1d10 + 2</strong>!</div>
-                    </div>
-
-                    <!-- Divine Sense -->
-                    <div class="action-card">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div style="font-weight:700; color:#facc15;">👁️ Divine Sense (<span id="ds-count">3</span>/3 per Day)</div>
-                            <button class="btn-roll-action" style="background:#ca8a04;" onclick="useDivineSense()">👁️ Sense Evil</button>
-                        </div>
-                        <div style="font-size:0.72rem; color:var(--text-dim);">Action to detect the location of any celestial, fiend, or undead within 60ft that is not behind total cover.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- INVENTORY & PURSE -->
-            <div class="panel">
-                <div class="panel-title"><span>🎒 Knight's Loadout & Coin Purse</span><span style="color:var(--accent-paladin); font-size:0.75rem;">💰 10 GP • 0 SP</span></div>
-                <div style="font-size:0.74rem; color:var(--text-dim); display:flex; flex-direction:column; gap:3px;">
-                    <div>• 🛡️ <strong>Chain Mail (AC 16) & Steel Crest Shield (+2 AC):</strong> Total AC 18.</div>
-                    <div>• 🗡️ <strong>Steel Longsword & Javelins (x5):</strong> Battle-tested weaponry.</div>
-                    <div>• 🧪 <strong>Potion of Healing (x1):</strong> Restores 2d4+2 HP in emergencies.</div>
-                    <div>• 📜 <strong>Holy Symbol of the Order:</strong> Polished silver medallion.</div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+    
+    <div class="dice-result-box">
+      <div>
+        <div class="dice-roll-name" id="rollName">Shield Raised & Blade Ready</div>
+        <div class="dice-roll-calc" id="rollCalc">Click any attack, smite feature, save, or die below</div>
+      </div>
+      <div class="dice-roll-total" id="rollTotal">--</div>
+    </div>
+
+    <div class="quick-dice-bar">
+      <button class="q-die-btn" onclick="rollDie(4)">d4</button>
+      <button class="q-die-btn" onclick="rollDie(6)">d6</button>
+      <button class="q-die-btn" onclick="rollDie(8)">d8</button>
+      <button class="q-die-btn" onclick="rollDie(10)">d10</button>
+      <button class="q-die-btn" onclick="rollDie(12)">d12</button>
+      <button class="q-die-btn" onclick="rollDie(20)">d20</button>
+      <button class="q-die-btn" onclick="rollDie(100)">d100</button>
+    </div>
+  </div>
+
+  <!-- CHARACTER HEADER -->
+  <div class="char-header">
+    <div class="char-title-group">
+      <h1>Sir Valerius the Steadfast</h1>
+      <div class="char-subtitle">Holy Bastion Knight • Guardian of the Silver Lion</div>
+      <div class="char-tags">
+        <span class="badge badge-class">Paladin 1</span>
+        <span class="badge badge-race">Human</span>
+        <span class="badge badge-align">Lawful Good</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-export" onclick="exportData()">📋 Export Data</button>
+      <div style="font-size:0.7rem; color:var(--text-dim); text-align:right;">Level 1 • Proficiency +2</div>
+    </div>
+  </div>
+
+  <!-- 4-BOX VITALS ROW -->
+  <div class="vitals-row">
+    <div class="vital-box">
+      <div class="vital-label">HIT POINTS</div>
+      <div class="vital-value" id="dispHP">12 / 12</div>
+      <div class="vital-sub" id="dispTempHP">+0 Temp HP</div>
+    </div>
+    <div class="vital-box">
+      <div class="vital-label">ARMOR CLASS</div>
+      <div class="vital-value" id="dispAC">18</div>
+      <div class="vital-sub">Chain Mail (16) + Shield (+2)</div>
+    </div>
+    <div class="vital-box clickable" onclick="rollInit()">
+      <div class="vital-label">INITIATIVE 🎲</div>
+      <div class="vital-value">+0</div>
+      <div class="vital-sub">DEX Mod</div>
+    </div>
+    <div class="vital-box clickable" onclick="rollDivineSave()">
+      <div class="vital-label">DIVINE DC / HIT</div>
+      <div class="vital-value">12 / +4</div>
+      <div class="vital-sub">CHA Spellcasting</div>
+    </div>
+  </div>
+
+  <!-- HP & TEMP HP CONTROLLER -->
+  <div class="hp-tracker-card">
+    <div class="hp-section-title">
+      <span>HEALTH CONTROLLER</span>
+      <span id="hpPercentText">100%</span>
+    </div>
+    <div class="hp-bar-container">
+      <div class="hp-bar-fill" id="hpBarFill"></div>
+    </div>
+
+    <div class="hp-controls-grid">
+      <!-- Damage / Heal -->
+      <div>
+        <div class="hp-section-title"><span>Apply Damage / Heal</span></div>
+        <div class="stepper-row">
+          <button class="step-btn btn-damage" onclick="applyDamage()">💥 Take Dmg</button>
+          <input type="number" class="step-input" id="hpDeltaInput" value="5" min="1">
+          <button class="step-btn btn-heal" onclick="applyHeal()">💚 Heal</button>
+        </div>
+      </div>
+      <!-- Temp HP -->
+      <div>
+        <div class="hp-section-title"><span>Temporary HP</span></div>
+        <div class="stepper-row">
+          <input type="number" class="step-input" id="tempHpInput" value="5" min="1">
+          <button class="step-btn" onclick="setTempHP()">🛡️ Set Temp HP</button>
+          <button class="step-btn" onclick="clearTempHP()">✕ Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hp-quick-actions">
+      <button class="btn-quick-action" onclick="takeShortRest()">☕ Short Rest (1d10+2)</button>
+      <button class="btn-quick-action" onclick="longRest()">🛌 Long Rest (Full Reset)</button>
+    </div>
+  </div>
+
+  <!-- LAY ON HANDS POOL CONTROLLER -->
+  <div class="lay-on-hands-card">
+    <div class="hp-section-title">
+      <span style="color:#56d364;">✨ LAY ON HANDS POOL (Touch Heal / Cure)</span>
+      <span id="lohDisp" style="color:#56d364; font-weight:bold;">5 / 5 HP Pool</span>
+    </div>
+    <div class="pool-bar-container">
+      <div class="pool-bar-fill" id="lohBarFill"></div>
+    </div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+      <button class="step-btn" onclick="spendLayOnHands(1)">✨ Heal 1 HP</button>
+      <button class="step-btn" onclick="spendLayOnHands(2)">✨ Heal 2 HP</button>
+      <button class="step-btn" onclick="spendLayOnHands(5)">✨ Heal 5 HP / Cure Poison</button>
+      <button class="step-btn" style="margin-left:auto;" onclick="openModal('layOnHands')">ℹ️ Rules</button>
+    </div>
+  </div>
+
+  <!-- BUFF TOGGLES & HELP TOKENS -->
+  <div class="toggles-tokens-card">
+    <div>
+      <div class="hp-section-title"><span>ACTIVE DEFENSIVE STANCES</span></div>
+      <div class="buff-toggle-row">
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleShieldStance" onchange="toggleShieldStance()">
+          <span class="toggle-slider"></span>
+        </label>
+        <div>
+          <div style="font-size:0.85rem; font-weight:bold; color:#fff;">🛡️ Interception Reaction</div>
+          <div style="font-size:0.7rem; color:var(--text-muted);">Reaction: Block 1d10+2 damage dealt to adjacent ally!</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="hp-section-title">
+        <span>HELP TOKENS (+1d6 to ally)</span>
+        <span id="helpTokenCount">2 / 2</span>
+      </div>
+      <div class="token-boxes">
+        <div class="token-dot" id="tok1" onclick="useHelpToken(1)"></div>
+        <div class="token-dot" id="tok2" onclick="useHelpToken(2)"></div>
+        <button class="step-btn" style="padding:2px 8px; font-size:0.7rem; margin-left:8px;" onclick="resetHelpTokens()">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 ABILITY SCORES -->
+  <div class="stats-grid">
+    <div class="stat-box" onclick="rollStat('Strength Check', 3)">
+      <div class="stat-abbr">STR</div>
+      <div class="stat-mod">+3</div>
+      <div class="stat-score">16</div>
+    </div>
+    <div class="stat-box" onclick="rollStat('Dexterity Check', 0)">
+      <div class="stat-abbr">DEX</div>
+      <div class="stat-mod">+0</div>
+      <div class="stat-score">10</div>
+    </div>
+    <div class="stat-box" onclick="rollStat('Constitution Check', 2)">
+      <div class="stat-abbr">CON</div>
+      <div class="stat-mod">+2</div>
+      <div class="stat-score">14</div>
+    </div>
+    <div class="stat-box" onclick="rollStat('Intelligence Check', -1)">
+      <div class="stat-abbr">INT</div>
+      <div class="stat-mod">-1</div>
+      <div class="stat-score">9</div>
+    </div>
+    <div class="stat-box" onclick="rollStat('Wisdom Check', 1)">
+      <div class="stat-abbr">WIS</div>
+      <div class="stat-mod">+1</div>
+      <div class="stat-score">12</div>
+    </div>
+    <div class="stat-box" onclick="rollStat('Charisma Check', 2)">
+      <div class="stat-abbr">CHA</div>
+      <div class="stat-mod">+2</div>
+      <div class="stat-score">14</div>
+    </div>
+  </div>
+
+  <!-- SAVING THROWS -->
+  <div class="saves-card">
+    <div class="saves-title">SAVING THROWS (Proficient in WIS & CHA)</div>
+    <div class="saves-grid">
+      <div class="save-pill" onclick="rollSave('Strength Save', 3)">
+        <div class="save-pill-name">STR</div>
+        <div class="save-pill-val">+3</div>
+      </div>
+      <div class="save-pill" onclick="rollSave('Dexterity Save', 0)">
+        <div class="save-pill-name">DEX</div>
+        <div class="save-pill-val">+0</div>
+      </div>
+      <div class="save-pill" onclick="rollSave('Constitution Save', 2)">
+        <div class="save-pill-name">CON</div>
+        <div class="save-pill-val">+2</div>
+      </div>
+      <div class="save-pill" onclick="rollSave('Intelligence Save', -1)">
+        <div class="save-pill-name">INT</div>
+        <div class="save-pill-val">-1</div>
+      </div>
+      <div class="save-pill prof" onclick="rollSave('Wisdom Save (Proficient)', 3)">
+        <div class="save-pill-name">WIS ★</div>
+        <div class="save-pill-val">+3</div>
+      </div>
+      <div class="save-pill prof" onclick="rollSave('Charisma Save (Proficient)', 4)">
+        <div class="save-pill-name">CHA ★</div>
+        <div class="save-pill-val">+4</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 18 SKILLS -->
+  <div class="skills-card">
+    <div class="saves-title">SKILLS & PROFICIENCIES</div>
+    <div class="skills-grid">
+      <div class="skill-btn" onclick="rollSkill('Acrobatics', 0)"><div class="skill-left"><span class="skill-stat">DEX</span> Acrobatics</div><div class="skill-val">+0</div></div>
+      <div class="skill-btn" onclick="rollSkill('Animal Handling', 1)"><div class="skill-left"><span class="skill-stat">WIS</span> Animal Handling</div><div class="skill-val">+1</div></div>
+      <div class="skill-btn" onclick="rollSkill('Arcana', -1)"><div class="skill-left"><span class="skill-stat">INT</span> Arcana</div><div class="skill-val">-1</div></div>
+      <div class="skill-btn prof" onclick="rollSkill('Athletics', 5)"><div class="skill-left"><span class="skill-prof-star">★</span><span class="skill-stat">STR</span> Athletics</div><div class="skill-val">+5</div></div>
+      <div class="skill-btn" onclick="rollSkill('Deception', 2)"><div class="skill-left"><span class="skill-stat">CHA</span> Deception</div><div class="skill-val">+2</div></div>
+      <div class="skill-btn" onclick="rollSkill('History', -1)"><div class="skill-left"><span class="skill-stat">INT</span> History</div><div class="skill-val">-1</div></div>
+      <div class="skill-btn" onclick="rollSkill('Insight', 1)"><div class="skill-left"><span class="skill-stat">WIS</span> Insight</div><div class="skill-val">+1</div></div>
+      <div class="skill-btn prof" onclick="rollSkill('Intimidation', 4)"><div class="skill-left"><span class="skill-prof-star">★</span><span class="skill-stat">CHA</span> Intimidation</div><div class="skill-val">+4</div></div>
+      <div class="skill-btn" onclick="rollSkill('Investigation', -1)"><div class="skill-left"><span class="skill-stat">INT</span> Investigation</div><div class="skill-val">-1</div></div>
+      <div class="skill-btn" onclick="rollSkill('Medicine', 1)"><div class="skill-left"><span class="skill-stat">WIS</span> Medicine</div><div class="skill-val">+1</div></div>
+      <div class="skill-btn" onclick="rollSkill('Nature', -1)"><div class="skill-left"><span class="skill-stat">INT</span> Nature</div><div class="skill-val">-1</div></div>
+      <div class="skill-btn" onclick="rollSkill('Perception', 1)"><div class="skill-left"><span class="skill-stat">WIS</span> Perception</div><div class="skill-val">+1</div></div>
+      <div class="skill-btn" onclick="rollSkill('Performance', 2)"><div class="skill-left"><span class="skill-stat">CHA</span> Performance</div><div class="skill-val">+2</div></div>
+      <div class="skill-btn prof" onclick="rollSkill('Persuasion', 4)"><div class="skill-left"><span class="skill-prof-star">★</span><span class="skill-stat">CHA</span> Persuasion</div><div class="skill-val">+4</div></div>
+      <div class="skill-btn prof" onclick="rollSkill('Religion', 1)"><div class="skill-left"><span class="skill-prof-star">★</span><span class="skill-stat">INT</span> Religion</div><div class="skill-val">+1</div></div>
+      <div class="skill-btn" onclick="rollSkill('Sleight of Hand', 0)"><div class="skill-left"><span class="skill-stat">DEX</span> Sleight of Hand</div><div class="skill-val">+0</div></div>
+      <div class="skill-btn" onclick="rollSkill('Stealth', 0)"><div class="skill-left"><span class="skill-stat">DEX</span> Stealth</div><div class="skill-val">+0</div></div>
+      <div class="skill-btn" onclick="rollSkill('Survival', 1)"><div class="skill-left"><span class="skill-stat">WIS</span> Survival</div><div class="skill-val">+1</div></div>
+    </div>
+  </div>
+
+  <!-- GOLD PURSE -->
+  <div class="gold-card">
+    <div class="gold-display">
+      <div class="gold-coin-stack">💰</div>
+      <div>
+        <div style="font-size:0.7rem; color:var(--text-muted); font-weight:bold; text-transform:uppercase;">PURSE (10 SP = 1 GP)</div>
+        <div class="gold-numbers" id="goldPurseDisp">16 GP, 0 SP</div>
+      </div>
+    </div>
+    <div class="gold-steppers">
+      <button class="g-btn" onclick="modGold(-1, 0)">-1 GP</button>
+      <button class="g-btn" onclick="modGold(1, 0)">+1 GP</button>
+      <button class="g-btn" onclick="modGold(0, -1)">-1 SP</button>
+      <button class="g-btn" onclick="modGold(0, 1)">+1 SP</button>
+      <button class="g-btn" onclick="openLedger()">📜 Ledger</button>
+    </div>
+  </div>
+
+  <!-- CLASS FEATURES & DIVINE SENSE -->
+  <div>
+    <div class="section-title"><span>PALADIN FEATURES & SENSES</span></div>
+
+    <!-- Divine Sense -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">👁️ Divine Sense</span>
+          <span class="action-badge badge-action">1 Action • 3/Day</span>
+        </div>
+        <div class="action-desc-short">Detect the location of any celestial, fiend, or undead within 60 ft not behind total cover.</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="useDivineSense()">👁️ Sense (<span id="senseUsesDisp">3</span>/3)</button>
+        <button class="btn-info-act" onclick="openModal('divineSense')">ℹ️</button>
+      </div>
+    </div>
+
+    <!-- Interception Fighting Style -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">🛡️ Interception Block</span>
+          <span class="action-badge badge-reaction">Reaction • At-Will</span>
+        </div>
+        <div class="action-desc-short">When adjacent ally (within 5ft) takes hit, interpose shield to reduce damage by 1d10 + 2!</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="rollInterception()">🛡️ Block (1d10+2)</button>
+        <button class="btn-info-act" onclick="openModal('interception')">ℹ️</button>
+      </div>
+    </div>
+
+    <!-- Divine Smite Preview -->
+    <div class="action-card" style="opacity:0.8;">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">⚡ Divine Smite</span>
+          <span class="action-badge badge-bonus" style="background:rgba(229, 169, 60, 0.2); color:#e5a93c;">Unlocks at Level 2</span>
+        </div>
+        <div class="action-desc-short">When you hit with a melee weapon, expend a spell slot to deal +2d8 radiant damage (+3d8 vs undead/fiend)!</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-info-act" onclick="openModal('divineSmite')">ℹ️ Preview</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEAPONS & MARTIAL ATTACKS -->
+  <div>
+    <div class="section-title"><span>WEAPONS & MARTIAL ATTACKS</span></div>
+
+    <!-- Knightly Longsword (1-Handed) -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">⚔️ Knightly Longsword (1-Handed)</span>
+          <span class="action-badge badge-action">Melee • 1 Action</span>
+        </div>
+        <div class="action-desc-short">Melee Weapon Attack (+5 to hit, Reach 5ft). 1d8 + 3 Slashing damage while holding shield.</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="attackLongsword1H()">⚔️ Attack (+5)</button>
+        <button class="btn-info-act" onclick="openModal('longsword')">ℹ️</button>
+      </div>
+    </div>
+
+    <!-- Longsword 2-Handed (Versatile) -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">🗡️ Longsword (Two-Handed Stance)</span>
+          <span class="action-badge badge-action">Melee • 1 Action</span>
+        </div>
+        <div class="action-desc-short">Melee Weapon Attack (+5 to hit, Reach 5ft). 1d10 + 3 Slashing damage (Shield sheathed).</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="attackLongsword2H()">🗡️ 1d10+3</button>
+        <button class="btn-info-act" onclick="openModal('longsword')">ℹ️</button>
+      </div>
+    </div>
+
+    <!-- Javelin -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">🎯 Thrown Javelin</span>
+          <span class="action-badge badge-action">Ranged / Melee</span>
+        </div>
+        <div class="action-desc-short">Thrown Weapon Attack (+5 to hit, Range 30/120 ft). Deals 1d6 + 3 Piercing damage.</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="attackJavelin()">🎯 Throw (+5)</button>
+        <button class="btn-info-act" onclick="openModal('javelin')">ℹ️</button>
+      </div>
+    </div>
+
+    <!-- Shield Bash / Athletics Shove -->
+    <div class="action-card">
+      <div class="action-left">
+        <div class="action-name-row">
+          <span class="action-name">🛡️ Shield Shove / Knockdown</span>
+          <span class="action-badge badge-action">Contested • 1 Action</span>
+        </div>
+        <div class="action-desc-short">Contested Athletics Check (+5). Knock target PRONE or push 5 feet away from you!</div>
+      </div>
+      <div class="action-right">
+        <button class="btn-roll-act" onclick="rollShieldShove()">🛡️ Shove (+5)</button>
+        <button class="btn-info-act" onclick="openModal('shieldShove')">ℹ️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVENTORY -->
+  <div class="inventory-card">
+    <div class="inv-header">
+      <span class="section-title" style="margin:0;">📦 EQUIPMENT & INVENTORY</span>
+      <span style="font-size:0.75rem; color:var(--text-muted);" id="invCountDisp">11 Items</span>
+    </div>
+    <div class="inv-input-row">
+      <input type="text" class="inv-input" id="newInvInput" placeholder="Add new item (e.g. 5x Torches, Silver Horn)...">
+      <button class="btn-add-inv" onclick="addItemFromInput()">+ Add</button>
+    </div>
+    <div class="inv-list" id="invListContainer">
+      <!-- Items dynamically populated -->
+    </div>
+  </div>
+
+</div>
+
+<!-- COMPENDIUM MODAL -->
+<div class="modal-overlay" id="compendiumModal" onclick="closeModal(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div class="modal-title" id="modalTitle">Feature / Weapon Name</div>
+    <div class="modal-pills" id="modalPills"></div>
+    <div class="modal-stat-grid" id="modalStats"></div>
+    <div class="modal-desc" id="modalDesc">Detailed rules text and beginner guidance.</div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
 </div>
 
 <script>
-    let curHP = 12, maxHP = 12, loh = 5, ds = 3, rollMode = 'norm';
+/* ==================== STATE ENGINE ==================== */
+const STORAGE_KEY = 'dnd_valerius_sheet_state';
 
-    function updateHPUI() {
-        document.getElementById('hp-bar').style.width = `${(curHP / maxHP) * 100}%`;
-        const d = document.getElementById('hp-disp');
-        d.innerText = `${curHP}/${maxHP}`;
-        d.style.color = curHP > 6 ? 'var(--accent-green)' : 'var(--accent-red)';
+const defaultState = {
+  currentHP: 12,
+  maxHP: 12,
+  tempHP: 0,
+  layOnHandsPool: 5,
+  maxLayOnHands: 5,
+  divineSense: 3,
+  maxDivineSense: 3,
+  shieldStance: true,
+  goldGP: 16,
+  goldSP: 0,
+  helpTokens: 2,
+  maxHelpTokens: 2,
+  inventory: [
+    { name: "Chain Mail Armor (AC 16)", qty: 1, desc: "Heavy interlocking steel rings. AC 16. Disadvantage on Stealth." },
+    { name: "Heavy Steel Shield (+2 AC)", qty: 1, desc: "Emblazoned with the noble Silver Lion of the Order." },
+    { name: "Knightly Longsword", qty: 1, desc: "1d8+3 slashing (1H) or 1d10+3 slashing (2H versatile)." },
+    { name: "Thrown Javelins", qty: 5, desc: "1d6+3 piercing weapon. Thrown range 30/120 ft." },
+    { name: "Holy Symbol of the Order (Silver Medallion)", qty: 1, desc: "Channeling focus for divine paladin powers." },
+    { name: "Potion of Healing", qty: 1, desc: "Action to consume. Immediately restores 2d4 + 2 HP." },
+    { name: "Silk Rope (50 ft)", qty: 1, desc: "Strong, lightweight elven silk climbing rope." },
+    { name: "Priest's Backpack & Bedroll", qty: 1, desc: "Sturdy leather pack containing field camping gear." },
+    { name: "Trail Rations", qty: 5, desc: "Preserved hardtack, dried meat, and nuts for the road." },
+    { name: "Waterskin", qty: 1, desc: "Full skin of fresh well-water." },
+    { name: "Tinderbox & 5 Torches", qty: 5, desc: "Flint and steel with dry pine torches." }
+  ],
+  ledger: [
+    "Starting Gold: 16 GP from the Order of the Silver Lion"
+  ]
+};
+
+let state = loadState();
+
+function loadState() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try { return JSON.parse(saved); } catch (e) { console.error(e); }
+  }
+  return JSON.parse(JSON.stringify(defaultState));
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  renderAll();
+}
+
+/* ==================== DICE & CONSOLE ==================== */
+let advMode = 'normal';
+
+function toggleAdv(mode) {
+  const btnA = document.getElementById('btnAdv');
+  const btnD = document.getElementById('btnDis');
+  if (advMode === mode) {
+    advMode = 'normal';
+    btnA.classList.remove('active-adv');
+    btnD.classList.remove('active-dis');
+  } else {
+    advMode = mode;
+    btnA.classList.toggle('active-adv', mode === 'adv');
+    btnD.classList.toggle('active-dis', mode === 'dis');
+  }
+}
+
+function rollD20(mod, label) {
+  let r1 = Math.floor(Math.random() * 20) + 1;
+  let r2 = Math.floor(Math.random() * 20) + 1;
+  let finalD20 = r1;
+  let detail = `1d20 (${r1}) + ${mod}`;
+  
+  if (advMode === 'adv') {
+    finalD20 = Math.max(r1, r2);
+    detail = `ADV: [${r1}, ${r2}] ➔ ${finalD20} + ${mod}`;
+  } else if (advMode === 'dis') {
+    finalD20 = Math.min(r1, r2);
+    detail = `DIS: [${r1}, ${r2}] ➔ ${finalD20} + ${mod}`;
+  }
+
+  let total = finalD20 + mod;
+  let totalEl = document.getElementById('rollTotal');
+  totalEl.className = 'dice-roll-total';
+
+  if (finalD20 === 20) {
+    totalEl.classList.add('crit-success');
+    detail += " • CRITICAL HIT! 🌟";
+  } else if (finalD20 === 1) {
+    totalEl.classList.add('crit-fail');
+    detail += " • NATURAL 1! 💀";
+  }
+
+  document.getElementById('rollName').textContent = label;
+  document.getElementById('rollCalc').textContent = detail;
+  totalEl.textContent = total;
+}
+
+function rollDie(sides) {
+  let r = Math.floor(Math.random() * sides) + 1;
+  document.getElementById('rollName').textContent = `Rolled 1d${sides}`;
+  document.getElementById('rollCalc').textContent = `Result on d${sides}`;
+  document.getElementById('rollTotal').className = 'dice-roll-total';
+  document.getElementById('rollTotal').textContent = r;
+}
+
+function rollStat(name, mod) { rollD20(mod, name); }
+function rollSave(name, mod) { rollD20(mod, name); }
+function rollSkill(name, mod) { rollD20(mod, `${name} Check`); }
+function rollInit() { rollD20(0, 'Initiative Check'); }
+function rollDivineSave() { rollD20(4, 'Paladin Divine Attack / Save DC Check'); }
+
+/* ==================== COMBAT ACTIONS & ROLLS ==================== */
+function attackLongsword1H() {
+  rollD20(5, 'Longsword Attack (1-Handed)');
+  setTimeout(() => {
+    let dmg = Math.floor(Math.random() * 8) + 1 + 3;
+    document.getElementById('rollCalc').textContent += ` ➔ Dmg: 1d8+3 = ${dmg} Slashing`;
+  }, 100);
+}
+
+function attackLongsword2H() {
+  rollD20(5, 'Longsword Attack (Two-Handed)');
+  setTimeout(() => {
+    let dmg = Math.floor(Math.random() * 10) + 1 + 3;
+    document.getElementById('rollCalc').textContent += ` ➔ Dmg: 1d10+3 = ${dmg} Slashing`;
+  }, 100);
+}
+
+function attackJavelin() {
+  rollD20(5, 'Thrown Javelin Attack (30/120 ft)');
+  setTimeout(() => {
+    let dmg = Math.floor(Math.random() * 6) + 1 + 3;
+    document.getElementById('rollCalc').textContent += ` ➔ Dmg: 1d6+3 = ${dmg} Piercing`;
+  }, 100);
+}
+
+function rollShieldShove() {
+  rollD20(5, 'Shield Shove (Athletics Check)');
+  document.getElementById('rollCalc').textContent += ' ➔ Contested by target STR (Athletics) or DEX (Acrobatics) to knock PRONE!';
+}
+
+function rollInterception() {
+  let block = Math.floor(Math.random() * 10) + 1 + 2;
+  document.getElementById('rollName').textContent = '🛡️ Interception Block Reaction!';
+  document.getElementById('rollCalc').textContent = `Reduced damage dealt to adjacent ally by 1d10 + 2 (Proficiency)!`;
+  document.getElementById('rollTotal').className = 'dice-roll-total';
+  document.getElementById('rollTotal').textContent = `-${block} Dmg`;
+}
+
+function useDivineSense() {
+  if (state.divineSense > 0) {
+    state.divineSense--;
+    saveState();
+    document.getElementById('rollName').textContent = '👁️ Divine Sense Activated';
+    document.getElementById('rollCalc').textContent = `Sensing celestials, fiends, undead & consecrated grounds within 60ft (${state.divineSense}/3 left)`;
+    document.getElementById('rollTotal').textContent = 'Active';
+  } else {
+    alert('No Divine Sense uses remaining! Regain all on Long Rest.');
+  }
+}
+
+function spendLayOnHands(amount) {
+  if (state.layOnHandsPool >= amount) {
+    state.layOnHandsPool -= amount;
+    saveState();
+    document.getElementById('rollName').textContent = `✨ Lay on Hands (-${amount} Pool)`;
+    document.getElementById('rollCalc').textContent = `Restored ${amount} HP to touched creature! (${state.layOnHandsPool}/5 HP remaining in pool)`;
+    document.getElementById('rollTotal').textContent = `+${amount} HP`;
+  } else {
+    alert(`Not enough Lay on Hands pool points! You have ${state.layOnHandsPool} HP left.`);
+  }
+}
+
+/* ==================== HP & VITALS ==================== */
+function applyDamage() {
+  let val = parseInt(document.getElementById('hpDeltaInput').value) || 0;
+  if (val <= 0) return;
+  
+  if (state.tempHP > 0) {
+    if (val <= state.tempHP) {
+      state.tempHP -= val;
+      val = 0;
+    } else {
+      val -= state.tempHP;
+      state.tempHP = 0;
     }
+  }
+  
+  state.currentHP = Math.max(0, state.currentHP - val);
+  saveState();
+}
 
-    function applyDamage() {
-        const inp = document.getElementById('hp-input');
-        const dmg = parseInt(inp.value) || 1;
-        inp.value = '';
-        curHP = Math.max(0, curHP - dmg);
-        updateHPUI();
-        logRoll(`💥 Took ${dmg} damage! HP: ${curHP}/${maxHP}`);
+function applyHeal() {
+  let val = parseInt(document.getElementById('hpDeltaInput').value) || 0;
+  if (val <= 0) return;
+  state.currentHP = Math.min(state.maxHP, state.currentHP + val);
+  saveState();
+}
+
+function setTempHP() {
+  let val = parseInt(document.getElementById('tempHpInput').value) || 0;
+  state.tempHP = val;
+  saveState();
+}
+
+function clearTempHP() {
+  state.tempHP = 0;
+  saveState();
+}
+
+function takeShortRest() {
+  let roll = Math.floor(Math.random() * 10) + 1 + 2;
+  state.currentHP = Math.min(state.maxHP, state.currentHP + roll);
+  saveState();
+  document.getElementById('rollName').textContent = '☕ Short Rest Taken';
+  document.getElementById('rollCalc').textContent = `Spent 1d10 Hit Die + 2 CON mod = Restored ${roll} HP`;
+  document.getElementById('rollTotal').textContent = `+${roll} HP`;
+}
+
+function longRest() {
+  if (confirm('Take a Long Rest? Resets HP to full, refreshes Lay on Hands pool (5 HP), Divine Sense (3 uses), and Help Tokens.')) {
+    state.currentHP = state.maxHP;
+    state.tempHP = 0;
+    state.layOnHandsPool = 5;
+    state.divineSense = 3;
+    state.helpTokens = 2;
+    saveState();
+    document.getElementById('rollName').textContent = '🛌 Long Rest Completed';
+    document.getElementById('rollCalc').textContent = 'Full HP, Lay on Hands pool & all abilities fully restored!';
+    document.getElementById('rollTotal').textContent = '100%';
+  }
+}
+
+/* ==================== BUFFS & TOKENS ==================== */
+function toggleShieldStance() {
+  state.shieldStance = document.getElementById('toggleShieldStance').checked;
+  saveState();
+}
+
+function useHelpToken(id) {
+  if (id <= state.helpTokens) {
+    state.helpTokens--;
+    let r = Math.floor(Math.random() * 6) + 1;
+    document.getElementById('rollName').textContent = '🤝 Help Token Granted to Ally!';
+    document.getElementById('rollCalc').textContent = `Ally adds +1d6 (${r}) to their next roll!`;
+    document.getElementById('rollTotal').textContent = `+${r}`;
+  } else {
+    state.helpTokens = Math.min(state.maxHelpTokens, state.helpTokens + 1);
+  }
+  saveState();
+}
+
+function resetHelpTokens() {
+  state.helpTokens = state.maxHelpTokens;
+  saveState();
+}
+
+/* ==================== GOLD & INVENTORY ==================== */
+function modGold(gp, sp) {
+  state.goldGP += gp;
+  state.goldSP += sp;
+  
+  if (state.goldSP >= 10) {
+    state.goldGP += Math.floor(state.goldSP / 10);
+    state.goldSP = state.goldSP % 10;
+  } else if (state.goldSP < 0) {
+    let borrow = Math.ceil(Math.abs(state.goldSP) / 10);
+    if (state.goldGP >= borrow) {
+      state.goldGP -= borrow;
+      state.goldSP += borrow * 10;
+    } else {
+      state.goldSP = 0;
+      state.goldGP = 0;
     }
+  }
+  
+  state.goldGP = Math.max(0, state.goldGP);
+  state.ledger.unshift(`Gold Change: ${gp > 0 ? '+' : ''}${gp} GP, ${sp > 0 ? '+' : ''}${sp} SP (Total: ${state.goldGP} GP, ${state.goldSP} SP)`);
+  if (state.ledger.length > 30) state.ledger.pop();
+  saveState();
+}
 
-    function applyHeal() {
-        const inp = document.getElementById('hp-input');
-        const h = parseInt(inp.value) || 1;
-        inp.value = '';
-        curHP = Math.min(maxHP, curHP + h);
-        updateHPUI();
-        logRoll(`💚 Healed +${h} HP! HP: ${curHP}/${maxHP}`);
-    }
+function openLedger() {
+  let text = state.ledger.join('
+');
+  alert("📜 TRANSACTION LEDGER:
 
-    function stepHP(d) { curHP = Math.max(0, Math.min(maxHP, curHP + d)); updateHPUI(); }
-    function takeShortRest() { curHP = Math.min(maxHP, curHP + 5); updateHPUI(); logRoll('☕ Regained +5 HP on Short Rest.'); }
-    function resetHP() { curHP = maxHP; loh = 5; ds = 3; document.getElementById('loh-count').innerText = '5 / 5'; document.getElementById('ds-count').innerText = '3'; updateHPUI(); logRoll('⛺ Full Long Rest! HP, Lay on Hands & Divine Sense restored.'); }
+" + (text || "No transactions recorded yet."));
+}
 
-    function spendLayOnHands(amt) {
-        if (loh < amt) { logRoll(`⚠️ Not enough Lay on Hands points left (${loh}/5)!`); return; }
-        loh -= amt;
-        document.getElementById('loh-count').innerText = `${loh} / 5`;
-        logRoll(`✨ <strong>LAY ON HANDS:</strong> Touched creature to restore <span style="color:#22c55e; font-weight:700;">+${amt} HP</span> (or cured 1 disease/poison if 5 spent)! (${loh}/5 left)`);
-    }
+function addItemFromInput() {
+  let val = document.getElementById('newInvInput').value.trim();
+  if (!val) return;
+  
+  let qty = 1;
+  let match = val.match(/^(\d+)[xX]\s*(.+)/);
+  let name = val;
+  if (match) {
+    qty = parseInt(match[1]);
+    name = match[2].trim();
+  }
+  
+  state.inventory.push({ name: name, qty: qty, desc: "Adventuring equipment." });
+  document.getElementById('newInvInput').value = '';
+  saveState();
+}
 
-    function rollInterceptionBlock() {
-        const r = Math.floor(Math.random() * 10) + 1;
-        const total = r + 2;
-        logRoll(`🛡️ <strong>INTERCEPTION STANCE (Reaction):</strong> You interpose your shield! Damage to ally reduced by [d10:${r} + 2] = <span style="color:var(--accent-paladin); font-weight:700;">-${total} DAMAGE</span>!`);
-    }
+function modInvQty(idx, delta) {
+  state.inventory[idx].qty += delta;
+  if (state.inventory[idx].qty <= 0) {
+    state.inventory.splice(idx, 1);
+  }
+  saveState();
+}
 
-    function useDivineSense() {
-        if (ds <= 0) { logRoll('⚠️ 0 Divine Sense uses left today!'); return; }
-        ds--;
-        document.getElementById('ds-count').innerText = ds;
-        logRoll(`👁️ <strong>DIVINE SENSE ACTIVATED:</strong> Sensed the location of all Undead, Fiends & Celestials within 60ft! (${ds}/3 left)`);
-    }
+function openItemModal(idx) {
+  let item = state.inventory[idx];
+  openCustomModal(item.name, ["Equipment", `Qty: ${item.qty}`], { "Item Type": "Inventory Gear", "Status": "Equipped/Carried" }, item.desc, null);
+}
 
-    function logRoll(msg) {
-        const r = document.getElementById('roll-res');
-        r.innerHTML = msg;
-        r.classList.remove('highlight-roll');
-        void r.offsetWidth;
-        r.classList.add('highlight-roll');
-    }
+/* ==================== EXPORT DATA ==================== */
+function exportData() {
+  let text = `Sir Valerius the Steadfast (Paladin 1)
+HP: ${state.currentHP}/${state.maxHP} (+${state.tempHP} Temp) | AC: 18
+Lay on Hands Pool: ${state.layOnHandsPool}/5 HP
+Divine Sense: ${state.divineSense}/3 | Help Tokens: ${state.helpTokens}/2
+Gold: ${state.goldGP} GP, ${state.goldSP} SP
+Active Stance: ${state.shieldStance ? 'Interception Reaction Active' : 'Neutral'}`;
+  
+  navigator.clipboard.writeText(text).then(() => {
+    alert("📋 Data copied to clipboard for Lead DM / Story Log:
 
-    function toggleAdvantage(m) {
-        rollMode = rollMode === m ? 'norm' : m;
-        document.getElementById('btn-adv').style.background = rollMode === 'adv' ? 'var(--accent-green)' : '#1e293b';
-        document.getElementById('btn-dis').style.background = rollMode === 'dis' ? 'var(--accent-red)' : '#1e293b';
-    }
+" + text);
+  }).catch(() => {
+    alert("Character Summary:
 
-    function rollCustomDie(s) {
-        const mod = parseInt(document.getElementById('dice-mod').value) || 0;
-        const roll = Math.floor(Math.random() * s) + 1;
-        logRoll(`🎲 <strong>d${s} Roll:</strong> (${roll}) = <span style="color:var(--accent-paladin); font-weight:700;">${roll+mod}</span>`);
-    }
+" + text);
+  });
+}
 
-    function rollD20(label, mod) {
-        const extra = parseInt(document.getElementById('dice-mod').value) || 0;
-        const total = mod + extra;
-        const r1 = Math.floor(Math.random() * 20) + 1;
-        const r2 = Math.floor(Math.random() * 20) + 1;
-        let c = rollMode === 'adv' ? Math.max(r1, r2) : rollMode === 'dis' ? Math.min(r1, r2) : r1;
-        logRoll(`🎯 <strong>${label}:</strong> d20(${c}) ${total>=0?'+'+total:total} = <span style="color:var(--accent-paladin); font-weight:700;">${c+total}</span>`);
-    }
+/* ==================== COMPENDIUM MODAL DATA ==================== */
+const compendium = {
+  layOnHands: {
+    title: "✨ Lay on Hands (Paladin Feature)",
+    pills: ["Healing Pool", "1 Action", "5 HP Pool"],
+    stats: { "Pool Size": "5 HP (5 x Level)", "Range": "Touch", "Special Action": "Spend 5 HP to cure 1 disease or neutralize 1 poison", "Reset": "Long Rest" },
+    desc: "Your blessed touch can heal wounds. You have a pool of healing power that replenishes when you take a long rest. With that pool, you can restore a total number of hit points equal to your paladin level × 5. As an action, you can touch a creature and draw power from the pool to restore a number of hit points to that creature, up to the maximum amount remaining in your pool.",
+    action: { name: "Heal 5 HP with Lay on Hands", fn: "spendLayOnHands(5)" }
+  },
+  divineSense: {
+    title: "👁️ Divine Sense",
+    pills: ["Paladin Feature", "1 Action", "3/Day"],
+    stats: { "Range": "60 Feet", "Uses": "3 per Long Rest (1 + CHA)", "Duration": "Until end of next turn", "Reveals": "Celestials, Fiends, Undead, Desecrated Places" },
+    desc: "The presence of strong evil registers on your senses like a noxious odor, and powerful good rings like heavenly music in your ears. As an action, you can open your awareness to detect such forces. Until the end of your next turn, you know the location of any celestial, fiend, or undead within 60 feet of you that is not behind total cover.",
+    action: { name: "Activate Divine Sense", fn: "useDivineSense()" }
+  },
+  interception: {
+    title: "🛡️ Fighting Style: Interception",
+    pills: ["Reaction", "Fighting Style", "Damage Reduction"],
+    stats: { "Range": "5 Feet", "Trigger": "Ally within 5ft hit by attack", "Effect": "Reduce damage by 1d10 + 2 (Proficiency)", "Requirement": "Holding Shield or Martial Weapon" },
+    desc: "When a creature you can see hits a target, other than you, within 5 feet of you with an attack, you can use your reaction to reduce the damage the target takes by 1d10 + your proficiency bonus (minimum of 0 damage). Protect your squishy allies from brutal enemy hits!",
+    action: { name: "Roll Interception Block (1d10+2)", fn: "rollInterception()" }
+  },
+  divineSmite: {
+    title: "⚡ Divine Smite (Unlocks at Level 2)",
+    pills: ["Level 2 Feature", "On-Hit", "Radiant Damage"],
+    stats: { "Cost": "1st Level Spell Slot", "Damage": "2d8 Radiant", "Bonus": "+1d8 extra vs Undead or Fiends (3d8 total!)", "Trigger": "Hit with melee weapon attack" },
+    desc: "Starting at 2nd level, when you hit a creature with a melee weapon attack, you can expend one spell slot to deal radiant damage to the target, in addition to the weapon's damage. The extra damage is 2d8 for a 1st-level spell slot, plus 1d8 for each spell level higher than 1st, to a maximum of 5d8. The damage increases by 1d8 if the target is an undead or a fiend!",
+    action: null
+  },
+  longsword: {
+    title: "⚔️ Knightly Longsword",
+    pills: ["Martial Melee Weapon", "Versatile", "Slashing"],
+    stats: { "Attack Mod": "+5 to hit (STR + Prof)", "1H Damage": "1d8 + 3 Slashing", "2H Damage": "1d10 + 3 Slashing", "Weight": "3 lbs" },
+    desc: "A beautifully forged steel longsword bearing the crest of the Silver Lion. Can be wielded one-handed with a shield for high defense (18 AC), or two-handed for increased strike damage (1d10+3).",
+    action: { name: "Attack with Longsword (+5)", fn: "attackLongsword1H()" }
+  },
+  javelin: {
+    title: "🎯 Thrown Javelins",
+    pills: ["Simple Weapon", "Thrown", "Piercing"],
+    stats: { "Attack Mod": "+5 to hit", "Damage": "1d6 + 3 Piercing", "Range": "30 / 120 Feet", "Carried": "5 Javelins" },
+    desc: "Lightweight steel-tipped throwing spears carried in a back quiver. Allows the Paladin to strike fleeing enemies or flying beasts from afar.",
+    action: { name: "Throw Javelin (+5)", fn: "attackJavelin()" }
+  },
+  shieldShove: {
+    title: "🛡️ Shield Shove & Knockdown",
+    pills: ["Special Attack", "Athletics", "Crowd Control"],
+    stats: { "Contest": "Athletics (+5) vs Target STR/DEX", "Effect": "Knock Prone OR Push 5 ft away", "Synergy": "All melee attacks against prone target have ADVANTAGE!" },
+    desc: "Using the Attack action, you can make a special melee attack to shove a creature, either to knock it prone or push it 5 feet away from you. The target must be no more than one size larger than you and within your reach. Once an enemy is knocked prone, all your and your party's melee attacks gain ADVANTAGE!",
+    action: { name: "Roll Athletics Shove (+5)", fn: "rollShieldShove()" }
+  }
+};
 
-    function rollFormulaDamage(label, sides, bonus, type) {
-        const r = Math.floor(Math.random() * sides) + 1;
-        logRoll(`💥 <strong>${label}:</strong> [d${sides}:${r} + ${bonus}] = <span style="color:var(--accent-paladin); font-weight:700;">${r+bonus}</span> ${type} Damage`);
-    }
+function openModal(key) {
+  let c = compendium[key];
+  if (!c) return;
+  openCustomModal(c.title, c.pills, c.stats, c.desc, c.action);
+}
 
-    function exportSheetState() {
-        const str = `🛡️ SIR VALERIUS [HP: ${curHP}/${maxHP} | AC: 18 | LoH: ${loh}/5 | DS: ${ds}/3] • 📦 Inventory: (No changes)`;
-        navigator.clipboard.writeText(str).then(() => logRoll(`📋 <strong>Exported:</strong> ${str}`));
-    }
+function openCustomModal(title, pills, stats, desc, action) {
+  document.getElementById('modalTitle').textContent = title;
+  
+  let pContainer = document.getElementById('modalPills');
+  pContainer.innerHTML = pills.map(p => `<span class="badge badge-class">${p}</span>`).join('');
+  
+  let sContainer = document.getElementById('modalStats');
+  sContainer.innerHTML = Object.entries(stats).map(([k, v]) => `<div><span style="color:var(--text-muted);">${k}:</span> <strong style="color:#fff;">${v}</strong></div>`).join('');
+  
+  document.getElementById('modalDesc').textContent = desc;
+  
+  let aContainer = document.getElementById('modalActions');
+  if (action) {
+    aContainer.innerHTML = `<button class="btn-modal-roll" onclick="${action.fn}; closeModalDirect();">${action.name}</button>`;
+  } else {
+    aContainer.innerHTML = '';
+  }
+  
+  document.getElementById('compendiumModal').style.display = 'flex';
+}
+
+function closeModal(e) {
+  if (e.target.id === 'compendiumModal') closeModalDirect();
+}
+
+function closeModalDirect() {
+  document.getElementById('compendiumModal').style.display = 'none';
+}
+
+/* ==================== RENDER ALL ==================== */
+function renderAll() {
+  // HP & Vitals
+  document.getElementById('dispHP').textContent = `${state.currentHP} / ${state.maxHP}`;
+  document.getElementById('dispTempHP').textContent = `+${state.tempHP} Temp HP`;
+  let pct = Math.round((state.currentHP / state.maxHP) * 100);
+  document.getElementById('hpPercentText').textContent = `${pct}%`;
+  document.getElementById('hpBarFill').style.width = `${pct}%`;
+  
+  // Lay on Hands Pool
+  document.getElementById('lohDisp').textContent = `${state.layOnHandsPool} / ${state.maxLayOnHands} HP Pool`;
+  let lohPct = Math.round((state.layOnHandsPool / state.maxLayOnHands) * 100);
+  document.getElementById('lohBarFill').style.width = `${lohPct}%`;
+  
+  // AC & Stance
+  let ac = 18; // Chain Mail 16 + Shield 2
+  document.getElementById('dispAC').textContent = ac;
+  document.getElementById('toggleShieldStance').checked = state.shieldStance;
+  
+  // Help Tokens
+  document.getElementById('helpTokenCount').textContent = `${state.helpTokens} / ${state.maxHelpTokens}`;
+  document.getElementById('tok1').className = `token-dot ${state.helpTokens >= 1 ? '' : 'spent'}`;
+  document.getElementById('tok2').className = `token-dot ${state.helpTokens >= 2 ? '' : 'spent'}`;
+  
+  // Divine Sense
+  document.getElementById('senseUsesDisp').textContent = state.divineSense;
+  
+  // Gold
+  document.getElementById('goldPurseDisp').textContent = `${state.goldGP} GP, ${state.goldSP} SP`;
+  
+  // Inventory
+  document.getElementById('invCountDisp').textContent = `${state.inventory.length} Items`;
+  let invContainer = document.getElementById('invListContainer');
+  invContainer.innerHTML = state.inventory.map((item, idx) => `
+    <div class="inv-item-row">
+      <div class="inv-item-left" onclick="openItemModal(${idx})">
+        <span style="color:var(--accent-gold);">•</span>
+        <span><strong>${item.qty > 1 ? item.qty + 'x ' : ''}${item.name}</strong></span>
+      </div>
+      <div class="inv-steppers">
+        <button class="inv-btn" onclick="modInvQty(${idx}, -1)">-</button>
+        <span style="font-size:0.75rem; font-weight:bold; min-width:18px; text-align:center;">${item.qty}</span>
+        <button class="inv-btn" onclick="modInvQty(${idx}, 1)">+</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Initial render
+renderAll();
 </script>
+
 </body>
 </html>
