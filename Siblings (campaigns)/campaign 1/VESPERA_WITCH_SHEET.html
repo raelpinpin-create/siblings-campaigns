@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lady Vespera — Level 1 Necrotic Witch</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #060911;
+            --bg-sheet: #0b101d;
+            --panel-bg: #121a2d;
+            --panel-sub: #0e1524;
+            --card-border: #1e2c47;
+            --accent-gold: #f59e0b;
+            --accent-poison: #84cc16;
+            --accent-necro: #c084fc;
+            --accent-blue: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+            --text-muted: #64748b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: var(--bg-page); color: var(--text-light); line-height: 1.5; padding: 16px 12px; display: flex; justify-content: center; font-size: 0.88rem; }
+        .sheet-container { width: 100%; max-width: 1180px; background-color: var(--bg-sheet); border: 1px solid var(--card-border); border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.85); overflow: hidden; }
+        .header-banner { background: linear-gradient(180deg, #16243d 0%, #0d1628 100%); border-bottom: 1px solid var(--card-border); padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .header-title h1 { font-family: 'Cinzel', serif; color: var(--accent-poison); font-size: 1.65rem; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; font-weight: 700; text-shadow: 0 0 14px rgba(132, 204, 22, 0.35); }
+        .pill-badge-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .pill-badge { padding: 4px 11px; border-radius: 9999px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+        .pill-evil { background: #4c1d95; color: #f3e8ff; border: 1px solid #7c3aed; }
+        .pill-poison { background: #14532d; color: #dcfce7; border: 1px solid #16a34a; }
+        .top-dice-console { background: #080c16; border-bottom: 1px solid var(--card-border); padding: 10px 18px; display: flex; flex-direction: column; gap: 8px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.5); }
+        .dice-controls-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .dice-buttons-group { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+        .dice-btn { background: var(--panel-bg); border: 1px solid var(--card-border); color: var(--text-light); padding: 4px 10px; border-radius: 5px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; }
+        .dice-btn:hover { border-color: var(--accent-poison); color: var(--accent-poison); background: rgba(132, 204, 22, 0.12); }
+        .roll-result-display { background: linear-gradient(135deg, #0d1629 0%, #090f1e 100%); border: 1.5px solid var(--card-border); border-radius: 6px; padding: 8px 14px; font-size: 0.92rem; color: #f8fafc; min-height: 40px; display: flex; align-items: center; transition: all 0.2s ease; }
+        .roll-result-display.highlight-roll { border-color: var(--accent-poison); box-shadow: 0 0 14px rgba(132, 204, 22, 0.35); }
+        .main-layout { display: grid; grid-template-columns: 340px 1fr; gap: 14px; padding: 14px 18px; }
+        @media (max-width: 960px) { .main-layout { grid-template-columns: 1fr; } }
+        .panel { background-color: var(--panel-bg); border: 1px solid var(--card-border); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .panel-title { font-size: 0.84rem; font-weight: 700; color: var(--accent-poison); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.06); padding-bottom: 5px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .vitals-4box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+        .vital-mini-box { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 6px 3px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .vital-mini-lbl { font-size: 0.65rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
+        .vital-mini-val { font-size: 1.1rem; font-weight: 700; color: var(--text-light); margin-top: 1px; }
+        .hp-ctrl-container { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 8px 10px; display: flex; flex-direction: column; gap: 7px; margin-bottom: 8px; }
+        .hp-health-bar-bg { width: 100%; height: 9px; background: #090d16; border-radius: 4px; overflow: hidden; border: 1px solid var(--card-border); position: relative; }
+        .hp-health-bar-fill { height: 100%; width: 100%; background: var(--accent-green); transition: width 0.3s ease; }
+        .hp-health-bar-temp { position: absolute; top: 0; right: 0; height: 100%; background: rgba(56, 189, 248, 0.65); transition: width 0.3s ease; }
+        .hp-input-num { background: #090d16; border: 1px solid var(--card-border); color: var(--text-light); font-size: 0.82rem; font-weight: 600; padding: 3px 5px; border-radius: 4px; text-align: center; outline: none; }
+        .hp-input-num:focus { border-color: var(--accent-poison); }
+        .btn-act { padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s ease; }
+        .btn-act:active { transform: scale(0.97); }
+        .btn-act-dmg { background: #991b1b; color: #fee2e2; }
+        .btn-act-dmg:hover { background: #b91c1c; }
+        .btn-act-heal { background: #065f46; color: #d1fae5; }
+        .btn-act-heal:hover { background: #047857; }
+        .btn-act-temp { background: #0284c7; color: #f0f9ff; border: 1px solid #38bdf8; }
+        .btn-act-pre { background: #1e293b; color: var(--text-light); border: 1px solid var(--card-border); }
+        .btn-act-pre:hover { background: #334155; }
+        .ability-strip { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 8px; }
+        .ability-box { background: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 5px; text-align: center; padding: 5px 2px; cursor: pointer; transition: all 0.15s ease; }
+        .ability-box:hover { border-color: var(--accent-poison); background: rgba(132, 204, 22, 0.08); }
+        .ability-box.active-key { border: 1.5px solid var(--accent-poison); background: rgba(132, 204, 22, 0.12); }
+        .ability-name { font-size: 0.65rem; font-weight: 700; color: var(--text-dim); }
+        .ability-score { font-size: 1rem; font-weight: 700; color: var(--text-light); }
+        .ability-mod { font-size: 0.72rem; font-weight: 600; color: var(--text-dim); }
+        .ability-box.active-key .ability-mod { color: var(--accent-poison); }
+        .stat-row-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+        .stat-row-item { font-size: 0.76rem; color: var(--text-light); padding: 3px 7px; background: var(--panel-sub); border-radius: 4px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.15s ease; border: 1px solid transparent; }
+        .stat-row-item:hover { background: #1e293b; border-color: var(--accent-poison); }
+        .stat-row-item.prof-item { color: var(--accent-poison); font-weight: 600; background: rgba(132, 204, 22, 0.08); border-left: 3px solid var(--accent-poison); }
+        .action-grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+        @media (max-width: 600px) { .action-grid-2col { grid-template-columns: 1fr; } }
+        .action-card { background-color: var(--panel-sub); border: 1px solid var(--card-border); border-radius: 6px; padding: 7px 9px; display: flex; flex-direction: column; gap: 4px; transition: all 0.15s ease; }
+        .action-card:hover { border-color: var(--accent-poison); }
+        .btn-roll-action { background: #0284c7; color: #f0f9ff; border: none; border-radius: 4px; padding: 3px 8px; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 3px; }
+        .btn-roll-action:hover { background: #0369a1; }
+        .btn-roll-dmg { background: #991b1b; color: #fee2e2; }
+        .btn-roll-dmg:hover { background: #b91c1c; }
+        .btn-roll-poison { background: #4d7c0f; color: #ecfccb; }
+        .btn-roll-poison:hover { background: #65a30d; }
+        .btn-roll-necro { background: #7e22ce; color: #fae8ff; }
+        .btn-roll-necro:hover { background: #9333ea; }
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(4, 7, 14, 0.85); backdrop-filter: blur(5px); z-index: 9999; justify-content: center; align-items: center; padding: 16px; }
+        .modal-overlay.active { display: flex; }
+        .modal-card { background: #0d1424; border: 1.5px solid var(--accent-poison); border-radius: 10px; width: 100%; max-width: 530px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85); overflow: hidden; }
+        .modal-header { background: #141d30; border-bottom: 1px solid var(--card-border); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close-btn { background: transparent; border: none; color: var(--text-dim); font-size: 1.1rem; cursor: pointer; }
+        .modal-close-btn:hover { color: #fff; }
+        .modal-body { padding: 12px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .newbie-box { background: rgba(132, 204, 22, 0.06); border-left: 3px solid var(--accent-poison); border-radius: 4px; padding: 8px 10px; font-size: 0.75rem; color: #ecfccb; line-height: 1.45; }
+    </style>
+</head>
+<body>
+
+<div class="sheet-container">
+    <header class="header-banner">
+        <div>
+            <h1>🧪 LADY VESPERA BLACKTHORNE</h1>
+            <div style="font-size:0.84rem; font-weight:700; color:#bef264;">« The Belladonna Sovereign » • Level 1 Witch (Necromancy Wizard)</div>
+            <div style="font-size:0.75rem; color:var(--text-dim);">Orderly poisoner, dark contract binder & master of decaying vitality</div>
+        </div>
+        <div class="pill-badge-group">
+            <button class="btn-act btn-act-pre" onclick="exportSheetState()" style="color:var(--accent-poison); border-color:var(--accent-poison);">📋 Export Data</button>
+            <span class="pill-badge pill-evil">LAWFUL EVIL</span>
+            <span class="pill-badge pill-poison">POISON & NECRO</span>
+        </div>
+    </header>
+
+    <section class="top-dice-console">
+        <div class="dice-controls-bar">
+            <div class="dice-buttons-group">
+                <span style="font-size:0.75rem; font-weight:700; color:var(--text-dim); margin-right:2px;">🎲 Quick Roll:</span>
+                <button class="dice-btn" onclick="rollCustomDie(20)">d20</button>
+                <button class="dice-btn" onclick="rollCustomDie(12)">d12</button>
+                <button class="dice-btn" onclick="rollCustomDie(10)">d10</button>
+                <button class="dice-btn" onclick="rollCustomDie(8)">d8</button>
+                <button class="dice-btn" onclick="rollCustomDie(6)">d6</button>
+                <button class="dice-btn" onclick="rollCustomDie(4)">d4</button>
+                <button class="dice-btn" onclick="rollCustomDie(100)">d100</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:5px;">
+                <span style="font-size:0.75rem; color:var(--text-dim);">Mod:</span>
+                <input type="number" id="dice-mod" class="hp-input-num" value="0" style="width:42px;">
+                <button class="btn-act btn-act-pre" onclick="modDiceMod(1)">+1</button>
+                <button class="btn-act btn-act-pre" onclick="modDiceMod(-1)">-1</button>
+                <button class="btn-act btn-act-pre" id="btn-adv" onclick="toggleAdvantage('adv')">Adv</button>
+                <button class="btn-act btn-act-pre" id="btn-dis" onclick="toggleAdvantage('dis')">Dis</button>
+            </div>
+        </div>
+        <div class="roll-result-display" id="roll-res">
+            🧪 Grim Grimoire initialized. Cast a spell or roll a skill check to begin your dark work!
+        </div>
+    </section>
+
+    <div class="main-layout">
+        <!-- LEFT COLUMN -->
+        <div>
+            <!-- VITALS 4-BOX -->
+            <div class="vitals-4box">
+                <div class="vital-mini-box">
+                    <span class="vital-mini-lbl">HIT POINTS</span>
+                    <span class="vital-mini-val" id="hp-disp" style="color:var(--accent-green);">8/8</span>
+                </div>
+                <div class="vital-mini-box">
+                    <span class="vital-mini-lbl">ARMOR CLASS</span>
+                    <span class="vital-mini-val" id="ac-disp" style="color:var(--accent-gold);">12</span>
+                </div>
+                <div class="vital-mini-box" onclick="rollD20('Initiative Check (DEX +2)', 2)" style="cursor:pointer;" title="Click to roll Initiative (+2)">
+                    <span class="vital-mini-lbl">INIT 🎲</span>
+                    <span class="vital-mini-val" style="color:var(--accent-blue);">+2</span>
+                </div>
+                <div class="vital-mini-box" title="Spell Save DC 13 | Spell Attack +5 (INT +3, Prof +2)">
+                    <span class="vital-mini-lbl">SPELL DC / HIT</span>
+                    <span class="vital-mini-val" style="font-size:0.86rem; color:var(--accent-poison);">DC 13 | +5</span>
+                </div>
+            </div>
+
+            <!-- HP CONTROLLER -->
+            <div class="hp-ctrl-container">
+                <div class="hp-health-bar-bg">
+                    <div class="hp-health-bar-fill" id="hp-bar" style="width: 100%;"></div>
+                    <div class="hp-health-bar-temp" id="hp-temp-bar" style="width: 0%;"></div>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <input type="number" id="hp-input" class="hp-input-num" placeholder="Enter amount..." style="flex:1; height:34px; font-size:0.9rem; text-align:left; padding:4px 8px;">
+                    <button class="btn-act btn-act-dmg" onclick="applyDamage()" style="padding:6px 12px; font-weight:700;">💥 Take Damage</button>
+                    <button class="btn-act btn-act-heal" onclick="applyHeal()" style="padding:6px 12px; font-weight:700;">💚 Heal HP</button>
+                </div>
+                <div style="display:flex; justify-content:space-between; gap:4px;">
+                    <button class="btn-act btn-act-dmg" onclick="stepHP(-1)">➖ -1</button>
+                    <button class="btn-act btn-act-heal" onclick="stepHP(1)">➕ +1</button>
+                    <button class="btn-act btn-act-pre" onclick="clearTempHP()">🛡️ Clear Temp</button>
+                    <button class="btn-act btn-act-pre" onclick="takeShortRest()">☕ Short Rest</button>
+                    <button class="btn-act btn-act-pre" onclick="resetHP()">⛺ Long Rest</button>
+                </div>
+            </div>
+
+            <!-- MAGE ARMOR BUFF TOGGLE -->
+            <div class="panel" style="padding:6px 10px; cursor:pointer;" onclick="toggleMageArmorBuff()">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-size:0.75rem; font-weight:700; color:#bef264;">🧙‍♀️ Ward of Thorns (Mage Armor)</div>
+                        <div style="font-size:0.66rem; color:var(--text-dim);" id="sub-mage-armor">Base AC: 12 (No Armor)</div>
+                    </div>
+                    <span class="pill-badge" id="badge-mage-armor" style="background:#334155; color:#94a3b8;">OFF (12 AC)</span>
+                </div>
+            </div>
+
+            <!-- HELP TOKENS TRACKER -->
+            <div class="panel" style="padding:6px 10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:0.76rem; font-weight:700; color:#67e8f9;">🤝 Witch's Hex Tokens:</span>
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <span id="help-tokens-disp" style="font-weight:700; color:#67e8f9; font-size:0.88rem;">2 / 2</span>
+                        <button class="btn-act btn-act-temp" onclick="rollHelpToken()" style="padding:2px 7px; font-size:0.7rem;">🎲 Aid Ally (+1d6)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6 ABILITIES -->
+            <div class="ability-strip">
+                <div class="ability-box" onclick="rollD20('STR Check', -1)"><div class="ability-name">STR</div><div class="ability-score">8</div><div class="ability-mod">-1</div></div>
+                <div class="ability-box" onclick="rollD20('DEX Check', 2)"><div class="ability-name">DEX</div><div class="ability-score">14</div><div class="ability-mod">+2</div></div>
+                <div class="ability-box" onclick="rollD20('CON Check', 2)"><div class="ability-name">CON</div><div class="ability-score">14</div><div class="ability-mod">+2</div></div>
+                <div class="ability-box active-key" onclick="rollD20('INT Check (Key)', 3)"><div class="ability-name">INT ★</div><div class="ability-score">16</div><div class="ability-mod">+3</div></div>
+                <div class="ability-box" onclick="rollD20('WIS Check', 1)"><div class="ability-name">WIS</div><div class="ability-score">12</div><div class="ability-mod">+1</div></div>
+                <div class="ability-box" onclick="rollD20('CHA Check', 0)"><div class="ability-name">CHA</div><div class="ability-score">10</div><div class="ability-mod">+0</div></div>
+            </div>
+
+            <!-- SAVES & SKILLS -->
+            <div class="panel">
+                <div class="panel-title"><span>🛡️ Saves & Core Proficiencies</span></div>
+                <ul class="stat-row-list">
+                    <li class="stat-row-item prof-item" onclick="rollD20('Intelligence Save ★', 5)"><span>Intelligence Save ★</span><span>+5 🎲</span></li>
+                    <li class="stat-row-item prof-item" onclick="rollD20('Wisdom Save ★', 3)"><span>Wisdom Save ★</span><span>+3 🎲</span></li>
+                    <li class="stat-row-item prof-item" onclick="rollD20('Arcana (INT) ★', 5)"><span>Arcana (INT) ★</span><span>+5 🎲</span></li>
+                    <li class="stat-row-item prof-item" onclick="rollD20('History (INT) ★', 5)"><span>History (INT) ★</span><span>+5 🎲</span></li>
+                    <li class="stat-row-item prof-item" onclick="rollD20('Investigation (INT) ★', 5)"><span>Investigation (INT) ★</span><span>+5 🎲</span></li>
+                    <li class="stat-row-item prof-item" onclick="rollD20('Deception (CHA) ★', 2)"><span>Deception (CHA) ★</span><span>+2 🎲</span></li>
+                    <li class="stat-row-item" onclick="rollD20('Stealth (DEX)', 2)"><span>Stealth (DEX)</span><span>+2 🎲</span></li>
+                    <li class="stat-row-item" onclick="rollD20('Perception (WIS)', 1)"><span>Perception (WIS)</span><span>+1 🎲</span></li>
+                    <li class="stat-row-item" onclick="rollD20('Medicine (WIS)', 1)"><span>Medicine (WIS)</span><span>+1 🎲</span></li>
+                </ul>
+            </div>
+
+            <!-- 💰 GOLD PURSE -->
+            <div class="panel" style="padding: 8px 10px; background: linear-gradient(135deg, #161a0f 0%, #0d121c 100%); border: 1px solid rgba(132, 204, 22, 0.35);">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <span>💰</span>
+                        <span style="color:var(--accent-poison); font-size:0.75rem; font-weight:800;">COIN PURSE</span>
+                    </div>
+                    <div style="font-weight:800; font-size:1.1rem; color:#facc15;">
+                        <span id="gold-disp">15</span> GP • <span id="silver-disp" style="color:#cbd5e1; font-size:0.95rem;">8</span> SP
+                    </div>
+                </div>
+            </div>
+
+            <!-- BEGINNER'S GUIDE -->
+            <div class="panel">
+                <div class="panel-title"><span>📖 Witch's Grimoire Guide</span></div>
+                <div class="newbie-box">
+                    <strong>1. Spells vs Cantrips:</strong> Cantrips (<em>Poison Spray, Toll the Dead</em>) can be cast infinitely! 1st-Level spells cost 1 spell slot.<br><br>
+                    <strong>2. Attack Roll vs Saving Throw:</strong> With <em>Chill Touch</em> and <em>Ray of Sickness</em>, YOU roll a d20+5 to hit their AC. With <em>Poison Spray</em> and <em>Toll the Dead</em>, the ENEMY rolls a save against your <strong>DC 13</strong>!<br><br>
+                    <strong>3. Lawful Evil Doctrine:</strong> You are calm, sophisticated, and ruthlessly efficient. You honor contracts to the letter and use poison to eliminate obstacles without messy violence.
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div>
+            <!-- AT-WILL ACTIONS & CANTRIPS -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>🧪 Witchcraft & At-Will Cantrips</span>
+                    <span style="font-size:0.7rem; color:var(--accent-poison);">Unlimited Casts</span>
+                </div>
+                <div class="action-grid-2col">
+                    <!-- Poison Spray -->
+                    <div class="action-card">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div style="font-weight:700; color:#bef264; cursor:pointer;" onclick="openSpellDetailsModal('poisonspray')">🤢 Poison Spray ℹ️</div>
+                                <div style="font-size:0.67rem; font-weight:700; color:var(--accent-poison);">Cantrip • 1 Action</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">10ft Range. Target makes <strong>DC 13 CON Save</strong> or takes <strong>1d12 Poison Damage</strong>.</div>
+                        <div style="display:flex; gap:4px; margin-top:2px;">
+                            <button class="btn-roll-action btn-roll-poison" onclick="rollFormulaDamage('Poison Spray', 12, 0, 'Poison')">💥 Roll 1d12 Poison</button>
+                        </div>
+                    </div>
+
+                    <!-- Toll the Dead -->
+                    <div class="action-card">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div style="font-weight:700; color:#c084fc; cursor:pointer;" onclick="openSpellDetailsModal('tollthedead')">🔔 Toll the Dead ℹ️</div>
+                                <div style="font-size:0.67rem; font-weight:700; color:var(--accent-necro);">Cantrip • 1 Action</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">60ft. DC 13 WIS Save. <strong>1d8 Necrotic</strong> (or <strong>1d12</strong> if target is already injured!).</div>
+                        <div style="display:flex; gap:4px; margin-top:2px;">
+                            <button class="btn-roll-action btn-roll-necro" onclick="rollFormulaDamage('Toll the Dead (Full HP)', 8, 0, 'Necrotic')">1d8 (Full HP)</button>
+                            <button class="btn-roll-action btn-roll-necro" onclick="rollFormulaDamage('Toll the Dead (Injured)', 12, 0, 'Necrotic')">💥 1d12 (Injured)</button>
+                        </div>
+                    </div>
+
+                    <!-- Chill Touch -->
+                    <div class="action-card">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div style="font-weight:700; color:#38bdf8; cursor:pointer;" onclick="openSpellDetailsModal('chilltouch')">💀 Chill Touch ℹ️</div>
+                                <div style="font-size:0.67rem; font-weight:700; color:var(--accent-blue);">Cantrip • 1 Action</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">120ft. +5 Spell Attack. <strong>1d8 Necrotic</strong> + target cannot regain HP for 1 round!</div>
+                        <div style="display:flex; gap:4px; margin-top:2px;">
+                            <button class="btn-roll-action" onclick="rollD20('Chill Touch Spell Attack', 5)">🎯 Attack (+5)</button>
+                            <button class="btn-roll-action btn-roll-necro" onclick="rollFormulaDamage('Chill Touch Damage', 8, 0, 'Necrotic')">💥 1d8 Necro</button>
+                        </div>
+                    </div>
+
+                    <!-- Obsidian Dagger -->
+                    <div class="action-card">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div style="font-weight:700; color:#cbd5e1;">🗡️ Obsidian Ritual Dagger</div>
+                                <div style="font-size:0.67rem; font-weight:700; color:#94a3b8;">Melee / Thrown • 1 Action</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">Melee 5ft / Thrown 20/60ft. +4 to Hit, <strong>1d4+2 Piercing</strong>.</div>
+                        <div style="display:flex; gap:4px; margin-top:2px;">
+                            <button class="btn-roll-action" onclick="rollD20('Dagger Attack', 4)">🗡️ Attack (+4)</button>
+                            <button class="btn-roll-action btn-roll-dmg" onclick="rollFormulaDamage('Dagger Damage', 4, 2, 'Piercing')">💥 1d4+2</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LEVEL 1 SPELL SLOTS & GRIMOIRE -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>🔮 Grimoire & 1st-Level Spells</span>
+                    <span id="slot-disp" style="font-size:0.74rem; color:var(--accent-blue);">Slots: 🟦 🟦 (2/2)</span>
+                </div>
+                <div class="action-grid-2col">
+                    <!-- Ray of Sickness -->
+                    <div class="action-card">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div style="font-weight:700; color:#84cc16; cursor:pointer;" onclick="openSpellDetailsModal('rayofsickness')">🤢 Ray of Sickness ℹ️</div>
+                                <div style="font-size:0.67rem; font-weight:700; color:var(--accent-poison);">1st Lvl • 1 Action</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">60ft. +5 Hit. <strong>2d8 Poison</strong> + target rolls DC 13 CON save or is <strong>Poisoned</strong> (Disadvantage on attacks)!</div>
+                        <div style="display:flex; gap:4px; margin-top:2px;">
+                            <button class="btn-roll-action" onclick="castSlotSpell('Ray of Sickness Attack', 5)">🎯 Cast & Attack (+5)</button>
+                            <button class="btn-roll-action btn-roll-poison" onclick="rollRayOfSicknessDmg()">💥 2d8 Poison</button>
+                        </div>
+                    </div>
+
+                    <!-- False Life -->
+                    <div class="action-card">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div style="font-weight:700; color:#c084fc; cursor:pointer;" onclick="openSpellDetailsModal('falselife')">🩸 False Life ℹ️</div>
+                                <div style="font-size:0.67rem; font-weight:700; color:var(--accent-necro);">1st Lvl • 1 Action</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">Self. Harness necrotic decay to grant yourself <strong>1d4 + 4 Temporary HP</strong> for 1 hour.</div>
+                        <div style="display:flex; gap:4px; margin-top:2px;">
+                            <button class="btn-roll-action btn-roll-necro" onclick="castFalseLife()">🩸 Cast (+1d4+4 Temp HP)</button>
+                        </div>
+                    </div>
+
+                    <!-- Cause Fear -->
+                    <div class="action-card">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div style="font-weight:700; color:#ef4444; cursor:pointer;" onclick="openSpellDetailsModal('causefear')">👁️ Cause Fear ℹ️</div>
+                                <div style="font-size:0.67rem; font-weight:700; color:var(--accent-red);">1st Lvl • 1 Action • Conc</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">60ft. Target makes DC 13 WIS save or becomes <strong>Frightened</strong> (Disadvantage on attacks/checks).</div>
+                        <div style="display:flex; gap:4px; margin-top:2px;">
+                            <button class="btn-roll-action btn-roll-dmg" onclick="castSlotUtility('👁️ Cause Fear Cast: Target must make DC 13 WIS Save or be Frightened!')">👁️ Cast Cause Fear</button>
+                        </div>
+                    </div>
+
+                    <!-- Find Familiar -->
+                    <div class="action-card">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                            <div>
+                                <div style="font-weight:700; color:#38bdf8; cursor:pointer;" onclick="openSpellDetailsModal('familiar')">🐍 Familiar: Emerald Viper ℹ️</div>
+                                <div style="font-size:0.67rem; font-weight:700; color:var(--accent-blue);">Ritual • 10 Min</div>
+                            </div>
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--text-dim);">Your venomous viper scout. Can deliver touch spells and take the Help action (+Advantage for ally)!</div>
+                        <div style="display:flex; gap:4px; margin-top:2px;">
+                            <button class="btn-roll-action" onclick="logRoll('🐍 Familiar commands issued: Viper uses Help action (+Advantage on ally\'s next strike)!')">🐍 Viper Help Action</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INVENTORY & SATCHEL -->
+            <div class="panel">
+                <div class="panel-title"><span>🎒 Tracked Satchel & Consumables</span></div>
+                <div style="display:flex; flex-direction:column; gap:4px; font-size:0.74rem;">
+                    <div style="background:var(--panel-sub); padding:4px 8px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>🧪 <strong>Nightshade Poison Vials (x2):</strong> Apply to weapon (+1d4 poison)</span>
+                        <button class="btn-act btn-act-pre" onclick="logRoll('🧪 Applied Nightshade Poison: Next weapon strike deals +1d4 Poison Damage!')">Apply</button>
+                    </div>
+                    <div style="background:var(--panel-sub); padding:4px 8px; border-radius:4px; display:flex; justify-content:space-between; align-items:center;">
+                        <span>🧪 <strong>Potion of Healing (x1):</strong> Restores 2d4+2 HP</span>
+                        <button class="btn-act btn-act-heal" onclick="logRoll('🧪 Drank Potion of Healing: Restored 2d4+2 HP!')">Drink</button>
+                    </div>
+                    <div style="background:var(--panel-sub); padding:4px 8px; border-radius:4px;">
+                        <span>📖 <strong>Serpent-Skin Grimoire:</strong> Contains arcane rituals and dark treaties.</span>
+                    </div>
+                    <div style="background:var(--panel-sub); padding:4px 8px; border-radius:4px;">
+                        <span>🕯️ <strong>Alchemical Skull Focus:</strong> Carved raven skull for channeling necrotic spells.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🔮 SPELL & ACTION DETAILS MODAL -->
+<div class="modal-overlay" id="spell-modal" onclick="closeSpellModalOnBackdrop(event)">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3 id="spell-modal-title" style="color:var(--accent-poison); font-family:'Cinzel', serif; font-size:1rem;">🔮 Spell Details</h3>
+            <button class="modal-close-btn" onclick="closeSpellModal()">✕</button>
+        </div>
+        <div class="modal-body" id="spell-modal-body"></div>
+    </div>
+</div>
+
+<script>
+    let curHP = 8, maxHP = 8, tempHP = 0, isMageArmor = false, slots = 2, maxSlots = 2, helpTokens = 2, rollMode = 'norm';
+
+    const spellDb = {
+        "poisonspray": {
+            name: "🤢 Poison Spray",
+            school: "Conjuration Cantrip",
+            castingTime: "1 Action",
+            range: "10 feet",
+            components: "V, S",
+            duration: "Instantaneous",
+            attackMod: "DC 13 Constitution Saving Throw",
+            damage: "1d12 Poison Damage (No damage on save)",
+            rules: "You extend your hand toward a creature you can see within range and project a puff of noxious toxic gas from your palm. The creature must succeed on a <strong>DC 13 Constitution saving throw</strong> or take <strong>1d12 poison damage</strong>.",
+            flavor: "Vespera releases an emerald haze of concentrated hemlock mist that burns through flesh and suffocates airways."
+        },
+        "tollthedead": {
+            name: "🔔 Toll the Dead",
+            school: "Necromancy Cantrip",
+            castingTime: "1 Action",
+            range: "60 feet",
+            components: "V, S",
+            duration: "Instantaneous",
+            attackMod: "DC 13 Wisdom Saving Throw",
+            damage: "1d8 Necrotic (Full HP) / 1d12 Necrotic (if injured)",
+            rules: "You point at one creature within range, and the sound of a mournful bell resonates around it. The target must succeed on a <strong>DC 13 Wisdom saving throw</strong> or take <strong>1d8 necrotic damage</strong>. If the target is missing any of its hit points, it takes <strong>1d12 necrotic damage</strong> instead.",
+            flavor: "A somber, spectral death toll echoes through the target's skull, drawing upon existing wounds to accelerate cellular decay."
+        },
+        "chilltouch": {
+            name: "💀 Chill Touch",
+            school: "Necromancy Cantrip",
+            castingTime: "1 Action",
+            range: "120 feet",
+            components: "V, S",
+            duration: "1 round",
+            attackMod: "+5 Spell Attack Roll",
+            damage: "1d8 Necrotic Damage & Healing Blocked",
+            rules: "You create a ghostly, skeletal hand in the space of a creature within range. Make a ranged spell attack (<strong>+5 to hit</strong>). On a hit, the target takes <strong>1d8 necrotic damage</strong>, and it cannot regain hit points until the start of your next turn.",
+            flavor: "An icy, translucent hand of the grave clamps onto the target's chest, freezing their blood and smothering regenerative vitality."
+        },
+        "rayofsickness": {
+            name: "🤢 Ray of Sickness",
+            school: "1st-Level Necromancy",
+            castingTime: "1 Action",
+            range: "60 feet",
+            components: "V, S",
+            duration: "Instantaneous",
+            attackMod: "+5 Spell Attack Roll / DC 13 Con Save",
+            damage: "2d8 Poison Damage + Poisoned Condition",
+            rules: "A ray of sickening greenish energy lashes out toward a creature within range. Make a ranged spell attack (<strong>+5 to hit</strong>). On a hit, the target takes <strong>2d8 poison damage</strong> and must make a <strong>DC 13 Constitution saving throw</strong>. On a failed save, it is also <strong>Poisoned</strong> until the end of your next turn (giving it Disadvantage on all attack rolls and ability checks!).",
+            flavor: "Vespera channels a concentrated stream of virulent miasma, rotting the target's defenses and debilitating their physical coordination."
+        },
+        "falselife": {
+            name: "🩸 False Life",
+            school: "1st-Level Necromancy",
+            castingTime: "1 Action",
+            range: "Self",
+            components: "V, S, M (a drop of alcohol or distilled spirit)",
+            duration: "1 hour",
+            attackMod: "Bolsters Personal Health",
+            damage: "Grants 1d4 + 4 Temporary HP",
+            rules: "Bolstering yourself with a necromantic facsimile of life, you gain <strong>1d4 + 4 temporary hit points</strong> for the duration. Damage taken will deplete these temporary hit points before harming your actual base health pool.",
+            flavor: "Vespera traces an abyssal sigil over her heart, weaving a protective matrix of spectral vigor that absorbs incoming attacks."
+        },
+        "causefear": {
+            name: "👁️ Cause Fear",
+            school: "1st-Level Necromancy",
+            castingTime: "1 Action",
+            range: "60 feet",
+            components: "V",
+            duration: "Concentration, up to 1 minute",
+            attackMod: "DC 13 Wisdom Saving Throw",
+            damage: "Frightened Condition (Disadvantage on attacks)",
+            rules: "You awaken the sense of mortality in one creature you can see within range. A construct or an undead is immune. The target must succeed on a <strong>DC 13 Wisdom saving throw</strong> or become <strong>Frightened</strong> of you until the spell ends. A frightened creature cannot move closer to you and has Disadvantage on ability checks and attack rolls while it can see you.",
+            flavor: "Vespera projects a chilling psychic whisper into the target's psyche, forcing them to visualize their own gruesome demise."
+        },
+        "familiar": {
+            name: "🐍 Familiar: Emerald Viper",
+            school: "1st-Level Conjuration (Ritual)",
+            castingTime: "10 Minutes (Ritual • No Slot)",
+            range: "10 feet",
+            components: "V, S, M (10 gp of incense)",
+            duration: "Instantaneous",
+            attackMod: "Telepathic Scout & Touch Delivery",
+            damage: "Utility / Help Action (+Advantage for allies)",
+            rules: "Your familiar acts independently of you, but always obeys your commands. In combat, it rolls its own initiative and acts on its turn. A familiar cannot attack, but it can take the <strong>Help Action</strong> to grant an ally Advantage on their attack roll, or deliver Touch spells on your behalf up to 100 feet away!",
+            flavor: "An emerald viper coiled around Vespera's arm, flicking its tongue and silently slithering into enemy blindsides."
+        }
+    };
+
+    function updateHPUI() {
+        const hpDisp = document.getElementById('hp-disp');
+        const hpBar = document.getElementById('hp-bar');
+        const hpTemp = document.getElementById('hp-temp-bar');
+        hpBar.style.width = `${Math.max(0, Math.min(100, (curHP / maxHP) * 100))}%`;
+        if (tempHP > 0) {
+            hpDisp.innerText = `${curHP} (+${tempHP} Temp) / ${maxHP}`;
+            hpDisp.style.color = 'var(--accent-blue)';
+            hpTemp.style.width = `${Math.min(100, (tempHP / maxHP) * 100)}%`;
+        } else {
+            hpDisp.innerText = `${curHP}/${maxHP}`;
+            hpDisp.style.color = curHP > 4 ? 'var(--accent-green)' : 'var(--accent-red)';
+            hpTemp.style.width = '0%';
+        }
+    }
+
+    function applyDamage() {
+        const input = document.getElementById('hp-input');
+        const dmg = parseInt(input.value) || 1;
+        input.value = '';
+        let rem = dmg;
+        if (tempHP > 0) {
+            if (tempHP >= rem) { tempHP -= rem; rem = 0; }
+            else { rem -= tempHP; tempHP = 0; }
+        }
+        curHP = Math.max(0, curHP - rem);
+        updateHPUI();
+        logRoll(`💥 <strong>Took ${dmg} Damage!</strong> Current HP: ${curHP}/${maxHP} ${tempHP > 0 ? '(+'+tempHP+' Temp)' : ''}`);
+    }
+
+    function applyHeal() {
+        const input = document.getElementById('hp-input');
+        const amt = parseInt(input.value) || 1;
+        input.value = '';
+        curHP = Math.min(maxHP, curHP + amt);
+        updateHPUI();
+        logRoll(`💚 <strong>Healed +${amt} HP!</strong> Current HP: ${curHP}/${maxHP}`);
+    }
+
+    function stepHP(d) {
+        if (d > 0) curHP = Math.min(maxHP, curHP + 1);
+        else if (tempHP > 0) tempHP -= 1;
+        else curHP = Math.max(0, curHP - 1);
+        updateHPUI();
+    }
+
+    function clearTempHP() { tempHP = 0; updateHPUI(); logRoll('🛡️ Temporary HP cleared.'); }
+    function takeShortRest() { curHP = Math.min(maxHP, curHP + 3); updateHPUI(); logRoll('☕ <strong>Short Rest:</strong> Restored +3 HP through dark meditation.'); }
+    function resetHP() { curHP = maxHP; tempHP = 0; slots = maxSlots; updateSlotDisp(); updateHPUI(); logRoll('⛺ <strong>Long Rest:</strong> Full HP & Spell Slots restored!'); }
+
+    function toggleMageArmorBuff() {
+        isMageArmor = !isMageArmor;
+        document.getElementById('ac-disp').innerText = isMageArmor ? '15' : '12';
+        document.getElementById('badge-mage-armor').className = isMageArmor ? 'pill-badge pill-poison' : 'pill-badge';
+        document.getElementById('badge-mage-armor').innerText = isMageArmor ? 'ON (15 AC)' : 'OFF (12 AC)';
+        document.getElementById('sub-mage-armor').innerText = isMageArmor ? 'Ward active: 13 + DEX (15 AC)' : 'Base AC: 12 (No Armor)';
+        logRoll(`🧙‍♀️ <strong>Ward of Thorns (Mage Armor):</strong> ${isMageArmor ? 'Activated (AC ➔ 15)' : 'Dismissed (AC ➔ 12)'}`);
+    }
+
+    function rollHelpToken() {
+        if (helpTokens <= 0) { logRoll('⚠️ 0 Hex Tokens left!'); return; }
+        helpTokens--;
+        document.getElementById('help-tokens-disp').innerText = `${helpTokens} / 2`;
+        const r = Math.floor(Math.random() * 6) + 1;
+        logRoll(`🤝 <strong>Witch\'s Hex Token Spent:</strong> Rolled <span style="color:#67e8f9; font-weight:700;">+${r}</span> to ally check! (${helpTokens}/2 left)`);
+    }
+
+    function updateSlotDisp() {
+        let pips = slots === 2 ? '🟦 🟦 (2/2)' : slots === 1 ? '🟦 ⬛ (1/2)' : '⬛ ⬛ (0/2)';
+        document.getElementById('slot-disp').innerText = `Slots: ${pips}`;
+    }
+
+    function castSlotSpell(name, mod) {
+        if (slots <= 0) { logRoll('⚠️ <strong>0 Spell Slots remaining!</strong> Take a Long Rest to restore slots.'); return; }
+        slots--;
+        updateSlotDisp();
+        rollD20(name + ' (-1 Slot)', mod);
+    }
+
+    function castSlotUtility(msg) {
+        if (slots <= 0) { logRoll('⚠️ <strong>0 Spell Slots remaining!</strong> Take a Long Rest.'); return; }
+        slots--;
+        updateSlotDisp();
+        logRoll(msg + ` (${slots}/2 slots left)`);
+    }
+
+    function rollRayOfSicknessDmg() {
+        const d1 = Math.floor(Math.random() * 8) + 1;
+        const d2 = Math.floor(Math.random() * 8) + 1;
+        logRoll(`🤢 <strong>Ray of Sickness Damage:</strong> [${d1} + ${d2}] = <span style="color:#84cc16; font-weight:700;">${d1+d2} Poison Damage</span>! (Target rolls DC 13 CON Save or is Poisoned)`);
+    }
+
+    function castFalseLife() {
+        if (slots <= 0) { logRoll('⚠️ 0 Spell Slots remaining!'); return; }
+        slots--;
+        updateSlotDisp();
+        const roll = Math.floor(Math.random() * 4) + 1;
+        const total = roll + 4;
+        tempHP = Math.max(tempHP, total);
+        updateHPUI();
+        logRoll(`🩸 <strong>False Life Cast:</strong> Gained <span style="color:#38bdf8; font-weight:700;">+${total} Temp HP</span>!`);
+    }
+
+    function openSpellDetailsModal(id) {
+        const sp = spellDb[id];
+        if (!sp) return;
+        document.getElementById('spell-modal-title').innerText = sp.name;
+        document.getElementById('spell-modal-body').innerHTML = `
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-bottom:6px;">
+                <span class="pill-badge" style="background:rgba(132,204,22,0.15); color:#bef264; border:1px solid #84cc16;">${sp.school}</span>
+                <span class="pill-badge" style="background:#1e293b; color:#93c5fd; border:1px solid #334155;">⏱️ ${sp.castingTime}</span>
+                <span class="pill-badge" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155;">📏 ${sp.range}</span>
+            </div>
+            <div style="background:rgba(132,204,22,0.06); border:1px solid rgba(132,204,22,0.25); border-radius:6px; padding:8px; font-size:0.76rem;">
+                <div><strong style="color:var(--text-dim);">Attack / Save:</strong> <span style="color:#bef264; font-weight:700;">${sp.attackMod}</span></div>
+                <div><strong style="color:var(--text-dim);">Damage / Effect:</strong> <span style="color:#f87171; font-weight:700;">${sp.damage}</span></div>
+            </div>
+            <div style="background:#0e1524; border:1px solid #1e2c47; border-radius:6px; padding:9px; font-size:0.78rem; line-height:1.5;">
+                <strong style="color:var(--accent-poison);">Official 5e Rules:</strong><br>${sp.rules}
+            </div>
+            <div style="font-style:italic; font-size:0.75rem; color:#94a3b8; padding:4px;">"${sp.flavor}"</div>
+        `;
+        document.getElementById('spell-modal').classList.add('active');
+    }
+
+    function closeSpellModal() { document.getElementById('spell-modal').classList.remove('active'); }
+    function closeSpellModalOnBackdrop(e) { if (e.target.id === 'spell-modal') closeSpellModal(); }
+
+    function logRoll(msg) {
+        const r = document.getElementById('roll-res');
+        r.innerHTML = msg;
+        r.classList.remove('highlight-roll');
+        void r.offsetWidth;
+        r.classList.add('highlight-roll');
+    }
+
+    function modDiceMod(d) { document.getElementById('dice-mod').value = (parseInt(document.getElementById('dice-mod').value) || 0) + d; }
+    function toggleAdvantage(m) {
+        rollMode = rollMode === m ? 'norm' : m;
+        document.getElementById('btn-adv').style.background = rollMode === 'adv' ? 'var(--accent-green)' : '#1e293b';
+        document.getElementById('btn-dis').style.background = rollMode === 'dis' ? 'var(--accent-red)' : '#1e293b';
+    }
+
+    function rollCustomDie(s) {
+        const mod = parseInt(document.getElementById('dice-mod').value) || 0;
+        const roll = Math.floor(Math.random() * s) + 1;
+        logRoll(`🎲 <strong>d${s} Roll:</strong> (${roll}) ${mod >= 0 ? '+'+mod : mod} = <span style="color:var(--accent-gold); font-weight:700;">${roll+mod}</span>`);
+    }
+
+    function rollD20(label, mod) {
+        const extra = parseInt(document.getElementById('dice-mod').value) || 0;
+        const totalMod = mod + extra;
+        const r1 = Math.floor(Math.random() * 20) + 1;
+        const r2 = Math.floor(Math.random() * 20) + 1;
+        let chosen = r1;
+        if (rollMode === 'adv') chosen = Math.max(r1, r2);
+        if (rollMode === 'dis') chosen = Math.min(r1, r2);
+        let msg = `🎯 <strong>${label}:</strong> d20(${chosen}) ${totalMod>=0?'+'+totalMod:totalMod} = <span style="color:var(--accent-poison); font-weight:700; font-size:1.05rem;">${chosen+totalMod}</span>`;
+        if (chosen === 20) msg += " 🔥 <span style='color:#facc15; font-weight:700;'>NAT 20 CRIT!</span>";
+        if (chosen === 1) msg += " 💀 <span style='color:#ef4444; font-weight:700;'>NAT 1 FAIL!</span>";
+        logRoll(msg);
+    }
+
+    function rollFormulaDamage(label, sides, bonus, type) {
+        const roll = Math.floor(Math.random() * sides) + 1;
+        logRoll(`💥 <strong>${label}:</strong> [d${sides}:${roll} + ${bonus}] = <span style="color:#bef264; font-weight:700;">${roll+bonus}</span> ${type} Damage`);
+    }
+
+    function exportSheetState() {
+        const str = `🧪 LADY VESPERA [HP: ${curHP}/${maxHP}${tempHP>0?' (+'+tempHP+' Temp)':''} | AC: ${document.getElementById('ac-disp').innerText} | Slots: L1(${slots}/2) | Help: ${helpTokens}/2] • 📦 Inventory: (No changes)`;
+        navigator.clipboard.writeText(str).then(() => logRoll(`📋 <strong>Exported State:</strong> ${str}`));
+    }
+</script>
+</body>
+</html>
