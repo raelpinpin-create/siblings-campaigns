@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siblings (campaigns) — Campaign 1 Character Roster</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-page: #080c18;
+            --bg-card: #0f172a;
+            --card-border: #1e293b;
+            --accent-gold: #f59e0b;
+            --accent-blue: #38bdf8;
+            --accent-poison: #84cc16;
+            --accent-radiant: #facc15;
+            --accent-purple: #c084fc;
+            --accent-green: #22c55e;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 16px;
+        }
+        .hub-container {
+            width: 100%;
+            max-width: 1160px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .hub-header {
+            text-align: center;
+            background: linear-gradient(180deg, #131d33 0%, #0c1424 100%);
+            border: 1px solid #1e2e48;
+            border-radius: 12px;
+            padding: 24px 20px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+        }
+        .hub-header h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--accent-gold);
+            font-size: 2rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .party-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
+        }
+        .hero-card {
+            background: var(--bg-card);
+            border: 1.5px solid var(--card-border);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 12px;
+            transition: all 0.25s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .hero-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 36px rgba(0,0,0,0.7);
+        }
+        .card-witch { border-color: rgba(132, 204, 22, 0.4); }
+        .card-witch:hover { border-color: var(--accent-poison); box-shadow: 0 0 20px rgba(132, 204, 22, 0.25); }
+        .card-nun { border-color: rgba(250, 204, 21, 0.4); }
+        .card-nun:hover { border-color: var(--accent-radiant); box-shadow: 0 0 20px rgba(250, 204, 21, 0.25); }
+        .card-paladin { border-color: rgba(56, 189, 248, 0.4); }
+        .card-paladin:hover { border-color: var(--accent-blue); box-shadow: 0 0 20px rgba(56, 189, 248, 0.25); }
+        .vitals-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin: 8px 0;
+        }
+        .v-box {
+            background: #090e1a;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 6px 3px;
+            text-align: center;
+        }
+        .v-lbl { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; }
+        .v-val { font-size: 1.05rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .btn-launch {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+        .btn-green { background: #15803d; color: #f0fdf4; border: 1px solid #22c55e; }
+        .btn-green:hover { background: #16a34a; }
+        .btn-gold { background: #b45309; color: #fefce8; border: 1px solid #facc15; }
+        .btn-gold:hover { background: #d97706; }
+        .btn-blue { background: #0369a1; color: #f0f9ff; border: 1px solid #38bdf8; }
+        .btn-blue:hover { background: #0284c7; }
+    </style>
+</head>
+<body>
+
+    <div class="hub-container">
+        <header class="hub-header">
+            <h1>⚔️ SIBLINGS (CAMPAIGNS) — CAMPAIGN 1</h1>
+            <p style="color:var(--text-dim); font-size:0.88rem; margin-top:4px;">Gold-Standard Interactive Character Cards with Live Dice Rolls, Spell Upcasting & Inventory Tracking.</p>
+        </header>
+
+        <div class="party-grid">
+            <!-- THE WITCH -->
+            <div class="hero-card card-witch">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <h2 style="font-family:'Cinzel', serif; font-size:1.35rem; color:var(--accent-poison);">🧪 Lady Vespera</h2>
+                            <div style="font-size:0.8rem; font-weight:600; color:#bef264;">Level 1 Witch (Necromancy Wizard)</div>
+                        </div>
+                        <span style="background:#4c1d95; color:#f3e8ff; border:1px solid #7c3aed; font-size:0.65rem; font-weight:700; padding:2px 7px; border-radius:999px;">LAWFUL EVIL</span>
+                    </div>
+
+                    <div class="vitals-preview">
+                        <div class="v-box"><div class="v-lbl">Hit Points</div><div class="v-val" style="color:var(--accent-green);">8</div></div>
+                        <div class="v-box"><div class="v-lbl">Armor Class</div><div class="v-val" style="color:var(--accent-gold);">12-15</div></div>
+                        <div class="v-box"><div class="v-lbl">DC / Hit</div><div class="v-val" style="color:var(--accent-poison);">DC 13 | +5</div></div>
+                    </div>
+
+                    <ul style="font-size:0.78rem; color:#cbd5e1; list-style:none; display:flex; flex-direction:column; gap:4px; line-height:1.4;">
+                        <li>• <strong>Poison Spray:</strong> 10ft puff dealing 1d12 poison damage (DC 13 CON Save).</li>
+                        <li>• <strong>Toll the Dead:</strong> 1d8 / 1d12 necrotic damage to injured foes.</li>
+                        <li>• <strong>Ray of Sickness:</strong> 2d8 poison damage & inflicts the Poisoned condition!</li>
+                        <li>• <strong>False Life:</strong> Grants 1d4+4 Temporary HP to bolster survival.</li>
+                    </ul>
+                </div>
+
+                <a href="VESPERA_WITCH_SHEET.html" class="btn-launch btn-green">
+                    <span>🧪 Launch Lady Vespera</span>
+                </a>
+            </div>
+
+            <!-- THE NUN -->
+            <div class="hero-card card-nun">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <h2 style="font-family:'Cinzel', serif; font-size:1.35rem; color:var(--accent-radiant);">☀️ Sister Beatrice</h2>
+                            <div style="font-size:0.8rem; font-weight:600; color:#fde047;">Level 1 Light Cleric (Holy DPS)</div>
+                        </div>
+                        <span style="background:#78350f; color:#fef3c7; border:1px solid #d97706; font-size:0.65rem; font-weight:700; padding:2px 7px; border-radius:999px;">LAWFUL NEUTRAL</span>
+                    </div>
+
+                    <div class="vitals-preview">
+                        <div class="v-box"><div class="v-lbl">Hit Points</div><div class="v-val" style="color:var(--accent-green);">10</div></div>
+                        <div class="v-box"><div class="v-lbl">Armor Class</div><div class="v-val" style="color:var(--accent-radiant);">16</div></div>
+                        <div class="v-box"><div class="v-lbl">DC / Hit</div><div class="v-val" style="color:var(--accent-radiant);">DC 13 | +5</div></div>
+                    </div>
+
+                    <ul style="font-size:0.78rem; color:#cbd5e1; list-style:none; display:flex; flex-direction:column; gap:4px; line-height:1.4;">
+                        <li>• <strong>Guiding Bolt:</strong> 4d6 Radiant nuke & grants Advantage to next ally attack!</li>
+                        <li>• <strong>Inflict Wounds:</strong> 3d10 close-quarters execution damage.</li>
+                        <li>• <strong>Warding Flare:</strong> Reaction to blind attackers (impose Disadvantage 3/day).</li>
+                        <li>• <strong>Healing Word:</strong> Bonus Action emergency revive.</li>
+                    </ul>
+                </div>
+
+                <a href="BEATRICE_NUN_SHEET.html" class="btn-launch btn-gold">
+                    <span>☀️ Launch Sister Beatrice</span>
+                </a>
+            </div>
+
+            <!-- THE PALADIN -->
+            <div class="hero-card card-paladin">
+                <div>
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <h2 style="font-family:'Cinzel', serif; font-size:1.35rem; color:var(--accent-blue);">🛡️ Sir Valerius</h2>
+                            <div style="font-size:0.8rem; font-weight:600; color:#7dd3fc;">Level 1 Paladin (Frontline Tank)</div>
+                        </div>
+                        <span style="background:#075985; color:#e0f2fe; border:1px solid #0284c7; font-size:0.65rem; font-weight:700; padding:2px 7px; border-radius:999px;">LAWFUL GOOD</span>
+                    </div>
+
+                    <div class="vitals-preview">
+                        <div class="v-box"><div class="v-lbl">Hit Points</div><div class="v-val" style="color:var(--accent-green);">12</div></div>
+                        <div class="v-box"><div class="v-lbl">Armor Class</div><div class="v-val" style="color:var(--accent-blue);">18</div></div>
+                        <div class="v-box"><div class="v-lbl">Melee Hit</div><div class="v-val" style="color:var(--accent-gold);">+5</div></div>
+                    </div>
+
+                    <ul style="font-size:0.78rem; color:#cbd5e1; list-style:none; display:flex; flex-direction:column; gap:4px; line-height:1.4;">
+                        <li>• <strong>18 AC Fortress:</strong> Chain Mail & Heavy Shield defend the front line.</li>
+                        <li>• <strong>Interception Stance:</strong> Reaction to block attacks on allies (-1d10+2 damage).</li>
+                        <li>• <strong>Lay on Hands:</strong> 5 HP pool to heal or cleanse poisons.</li>
+                        <li>• <strong>Divine Sense:</strong> Detect undead, fiends & celestials 3/day.</li>
+                    </ul>
+                </div>
+
+                <a href="VALERIUS_PALADIN_SHEET.html" class="btn-launch btn-blue">
+                    <span>🛡️ Launch Sir Valerius</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
